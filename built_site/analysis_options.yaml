@@ -1,0 +1,11 @@
+include: package:extra_pedantic/analysis_options.yaml
+
+analyzer:
+  exclude: ["**.g.dart"]
+
+linter:
+  rules:
+    avoid_returning_null: false # We have proper null-safety now
+    invariant_booleans: false # this is just completely broken
+    literal_only_boolean_expressions: false # sometimes a while (true) is just more convenient
+    prefer_void_to_null: false # I know what I'm doing, might want to turn this back on after migrating to null safety

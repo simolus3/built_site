@@ -1,0 +1,21 @@
+<div class="section-index">
+    <hr class="panel-line">
+
+    {% assign section = page_section %}
+    {% assign children = section.children | concat: section.pages | sortedByWeight %}
+
+    {% for child in children %}
+      {% if child == section.index %}
+        {% continue %}
+      {% endif %}
+      {% assign page = child.index | default: child | pageInfo %}
+      <div class="entry">
+        <h5>
+            <a href="{{ page.path | relUrl }}">{{ page.data.title }}</a>
+            {% if page.data.description %}
+              <p>{{ page.data.description | markdownify }}</p>
+            {% endif %}
+        </h5>
+      </div>
+    {% endfor %}
+</div>

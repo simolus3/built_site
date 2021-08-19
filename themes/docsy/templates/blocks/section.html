@@ -1,0 +1,11 @@
+{% assign col_id = args.color | default: ordinal %}
+{% assign height = args.height | default: "auto" %}
+{% assign type = args.type | default: "" %}
+<a id="td-block-{{ ordinal }}" class="td-offset-anchor"></a>
+<section class="row td-box td-box--{{ col_id }} td-box--gradient td-box--height-{{ height }}">
+	<div class="col">
+		<div class="row {{ type }}">
+			{{ inner }}
+		</div>
+	</div>
+</section>

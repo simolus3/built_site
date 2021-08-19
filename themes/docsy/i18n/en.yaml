@@ -1,0 +1,24 @@
+# UI strings. Buttons and similar.
+
+ui_pager_next: Next
+ui_pager_prev: Previous
+ui_read_more: Read more
+ui_search: Search this site…
+
+# Used in sentences such as "Posted in News"
+ui_in: "in"
+
+# Footer text
+footer_all_rights_reserved: "All Rights Reserved"
+
+footer_privacy_policy: "Privacy Policy"
+
+
+# Post (blog, articles etc.)
+post_byline_by: "By"
+post_created: "Created"
+post_last_mod: "Last modified"
+post_edit_this: "Edit this page"
+post_create_issue: "Create documentation issue"
+post_create_project_issue: "Create project issue"
+post_posts_in: "Posts in"

@@ -1,0 +1,35 @@
+{% assign section = args.section %}
+{% assign active = page_section.index == section.index %}
+{% assign isIndex = page_section.index == page.meta_id %}
+
+{% assign show = active or (page.source | isDescendant: section.index) or (isIndex and (page.source | isAncestor: section.index)) %}
+
+<ul class="td-sidebar-nav__section pr-md-3">
+    <li class="td-sidebar-nav__section-title">
+        {% assign index_info = section.index | pageInfo %}
+        {% assign permalink = index_info.path | relUrl %}
+        <a  href="{{ index_info.path | relUrl }}" class="align-left pl-0 pr-2{% if show == false %} collapsed{% endif %}{% if active %} active{% endif %} td-sidebar-link td-sidebar-link__section">{{ index_info.data.title }}</a>
+    </li>
+    <ul>
+        <li class="collapse{% if show %} show{% endif %}">
+            {% assign children = section.children | concat: section.pages | sortedByWeight %}
+            {% for child in children %}
+                {% assign is_page = child.index == null %}
+                {% if is_page %}
+                {% if child == section.index %}
+                    {% comment %}
+                    This is the page defining the section. Don't show both the section and its index!
+                    {% endcomment %}
+                    {% continue %}
+                {% endif %}
+
+                {% assign active = page.meta_id == child %}
+                {% assign page_info = child | pageInfo %}
+                <a class="td-sidebar-link td-sidebar-link__page {% if active %} active{% endif %}" href="{{ page_info.path | relUrl }}">{{ page_info.data.title }}</a>
+                {% else %}
+                {% include "partials/sidebar-recurse" section = child %}
+                {% endif %}
+            {% endfor %}
+        </li>
+    </ul>
+</ul>

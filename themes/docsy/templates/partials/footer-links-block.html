@@ -1,0 +1,9 @@
+<ul class="list-inline mb-0">
+    {% for link in links %}
+    <li class="list-inline-item mx-2 h3" data-toggle="tooltip" data-placement="top" title="{{ link.name }}" aria-label="{{ link.name }}">
+      <a class="text-white" target="_blank" rel="noopener noreferrer" href="{{ link.url }}">
+        <i class="{{ link.icon }}"></i>
+      </a>
+    </li>
+    {% endfor %}
+</ul>

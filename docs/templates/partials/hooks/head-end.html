@@ -1,0 +1,10 @@
+{% if page.source == 'pages/index.html' %}
+<style>
+#td-cover-block-0 {
+    background-image: url("{{ '/background.png' | relUrl }}");
+}
+</style>
+{% endif %}
+{% if page.path | startsWith: 'docs' %}
+<link rel="stylesheet" href="{{ '/highlight.css' | relUrl }}">
+{% endif %}

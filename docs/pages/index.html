@@ -1,0 +1,21 @@
+---
+page:
+  title: "built_site - A fast static site generator"
+template: layouts/home.html
+path: ""
+---
+
+{% block "blocks/cover.html" title="built_site" image_anchor="top" height="med" %}
+<div class="mx-auto">
+	<a class="btn btn-lg btn-primary mr-3 mb-4" href="{{ 'docs/index' | pageUrl }}">
+		Documentation <i class="fas fa-arrow-alt-circle-right ml-2"></i>
+	</a>
+	<a class="btn btn-lg btn-secondary mr-3 mb-4" href="https://pub.dev/packages/moor">
+		Get started <i class="fas fa-code ml-2 "></i>
+	</a>
+</div>
+{% endblock %}
+
+{% block "blocks/lead" color="dark" %}
+built_site is a fast yet powerful static site generator, based on Dart's build system.
+{% endblock %}

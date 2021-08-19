@@ -1,0 +1,22 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="generator" content="built_site {{ built_site.version }}">
+
+{% if environment == "prod" %}
+<META NAME="ROBOTS" CONTENT="INDEX, FOLLOW">
+{% else %}
+<META NAME="ROBOTS" CONTENT="NOINDEX, NOFOLLOW">
+{% endif %}
+
+{% include "partials/favicons.html" %}
+
+{% if aliases %}
+<link rel="canonical" href="{{ path | absUrl }}" />
+{% endif %}
+
+<title>{{page.title | default: site.title | default: 'Untitled Docsy site'}}</title>
+
+<link rel="stylesheet" href="{{ "/main.css" | relUrl }}">
+<script defer src="{{ "/main.dart.js" | relUrl }}"></script>
+
+{% include "partials/hooks/head-end.html" %}

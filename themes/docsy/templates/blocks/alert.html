@@ -1,0 +1,7 @@
+{% assign color = args.color | default: 'primary' %}
+<div class="alert alert-{{ color }}" role="alert">
+    {% if args.title %}
+      <h4 class="alert-heading">{{ args.title }}</h4>
+    {% endif %}
+    {{ inner | markdownify }}
+</div>

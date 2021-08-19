@@ -1,0 +1,11 @@
+<nav aria-label="breadcrumb" class="d-none d-md-block d-print-none">
+    <ol class="breadcrumb spb-1">
+        {% assign parent = '' | sectionOf %}
+        {% include "partials/breadcrumb_recurse" section = parent %}
+        
+        {% comment %} Finally add the page itself at the end {% endcomment %}
+        <li class="breadcrumb-item active" aria-current="page">
+            <a href="{{ path | relUrl }}">{{ page.title }}</a>
+        </li>
+    </ol>
+</nav>

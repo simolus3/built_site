@@ -1,0 +1,18 @@
+{% assign cover = kind == "home" %}
+<nav class="js-navbar-scroll navbar navbar-expand navbar-dark {% if cover %} td-navbar-cover {% endif %} flex-column flex-md-row td-navbar">
+    <a class="navbar-brand" href="{{ "/" | relUrl }}">
+    <span class="text-uppercase font-weight-bold">{{ site.title }}</span>
+</a>
+<div class="td-navbar-nav-scroll ml-md-auto" id="main_navbar">
+    <ul class="navbar-nav mt-2 mt-lg-0">
+        {% for entry in site.menu.main %}
+        <li class="nav-item mr-4 mb-2 mb-lg-0">
+            <a class="nav-link" href="{{ entry.url | relUrl }}">{{ entry.name }}</a>
+        </li>
+        {% endfor %}
+    </ul>
+</div>
+<div class="navbar-nav d-none d-lg-block">
+{% include "partials/search-input" %}
+</div>
+</nav>

@@ -1,0 +1,11 @@
+# This file overrides the default build.yaml when running the build inside this
+# package.
+# Since our builders depend on generated code, we want to avoid generating an
+# incomplete build script referencing sources that haven't been generated yet.
+
+targets:
+  $default:
+    builders:
+      json_serializable:
+        options:
+          checked: true

@@ -1,0 +1,4 @@
+{% include "partials/page-meta-links" %}
+{% if page.notoc != true and page.toc %}
+  {{ page.toc }}
+{% endif %}
