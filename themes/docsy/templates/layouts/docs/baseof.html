@@ -10,18 +10,18 @@
     <div class="container-fluid td-outer">
       <div class="td-main">
         <div class="row flex-xl-nowrap">
-          <div class="col-12 col-md-3 col-xl-2 td-sidebar d-print-none">
+          <aside class="col-12 col-md-3 col-xl-2 td-sidebar d-print-none">
             {% include "partials/sidebar" %}
-          </div>
-            <div class="d-none d-xl-block col-xl-2 td-toc d-print-none">
-              {% include "partials/toc" %}
-            </div>
-            <main class="col-12 col-md-9 col-xl-8 pl-md-5" role="main">
-              {% include "partials/breadcrumb" %}
-              {{ main }}
-            </main>
-          </div>
+          </aside>
+          <aside class="d-none d-xl-block col-xl-2 td-sidebar-toc d-print-none">
+            {% include "partials/toc" %}
+          </aside>
+          <main class="col-12 col-md-9 col-xl-8 pl-md-5" role="main">
+            {% include "partials/breadcrumb" %}
+            {{ main }}
+          </main>
         </div>
+      </div>
       {% include "partials/footer" %}
     </div>
   </body>
