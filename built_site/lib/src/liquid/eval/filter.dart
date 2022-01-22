@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:math';
 
 import 'package:intl/intl.dart';
@@ -45,11 +46,11 @@ int ceil(Object? input, List<Object?> args) {
 }
 
 Object? compact(Object? input, List<Object?> args) {
-  return (input as Iterable<Object?>).where((e) => e != null);
+  return (input! as Iterable<Object?>).where((e) => e != null);
 }
 
 Object? concat(Object? input, List<Object?> args) {
-  final start = (input as List).cast<Object?>();
+  final start = (input! as List).cast<Object?>();
 
   return <Object?>[
     ...start,
@@ -60,7 +61,7 @@ Object? concat(Object? input, List<Object?> args) {
 
 String date(Object? input, List<Object?> args) {
   final format = DateFormat(args.first.toString());
-  return format.format(DateTime.parse(input as String));
+  return format.format(DateTime.parse(input! as String));
 }
 
 Object? $default(Object? input, List<Object?> args) {
@@ -94,8 +95,12 @@ Object? get(Object? input, List<Object?> args) {
   return lookup(input, args.map((e) => e.toString()));
 }
 
+Object? jsonDecode(Object? input, List<Object?> args) {
+  return json.decode(input.toString());
+}
+
 Object? map(Object? input, List<Object?> args) {
-  return (input as Iterable<Object?>).map<Object?>((e) {
+  return (input! as Iterable<Object?>).map<Object?>((e) {
     if (e is! Map) return null;
     return e[args.single];
   });
@@ -117,7 +122,7 @@ Object? sort(Object? input, List<Object?> args) {
 
     return input
       ..sort((Object? a, Object? b) {
-        return Comparable.compare(map(a) as Comparable, map(b) as Comparable);
+        return Comparable.compare(map(a)! as Comparable, map(b)! as Comparable);
       });
   }
 
@@ -135,7 +140,7 @@ Object? times(Object? input, List<Object?> args) {
 
   try {
     return _toNum(input) * factor;
-  } catch (e) {
+  } on Object {
     if (input is String) return input * factor.floor();
   }
 
@@ -169,6 +174,7 @@ const Map<String, Filter> filters = {
   'downcase': downcase,
   'endsWith': endsWith,
   'get': get,
+  'json_decode': jsonDecode,
   'lower': downcase,
   'map': map,
   'markdownify': markdownify,

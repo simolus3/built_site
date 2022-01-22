@@ -247,6 +247,11 @@ class SiteGenerator extends Builder {
             });
             return entries;
           },
+          'readString': (input, args) async {
+            final asset =
+                AssetId.resolve(Uri.parse(input.toString()), from: sourceId);
+            return buildStep.readAsString(asset);
+          }
         },
       );
     }

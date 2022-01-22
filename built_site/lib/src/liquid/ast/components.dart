@@ -155,7 +155,8 @@ class ObjectTag extends TemplateComponent {
 class Text extends TemplateComponent {
   final Token token;
 
-  Text(this.token) : assert(token.type == TokenType.text);
+  Text(this.token)
+      : assert(token.type == TokenType.text, 'Invalid type for text token');
 
   @override
   Ret accept<Arg, Ret>(ComponentVisitor<Arg, Ret> visitor, Arg arg) {

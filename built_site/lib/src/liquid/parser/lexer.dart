@@ -154,7 +154,7 @@ class Lexer {
 
   Token _number(int firstChar) {
     int digit(int charCode) {
-      assert(charCode >= $0 && charCode <= $9);
+      assert(charCode >= $0 && charCode <= $9, 'Not a digit.');
       return charCode - $0;
     }
 

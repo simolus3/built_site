@@ -39,7 +39,7 @@ class TemplateEvaluator
   Future<Object?> _evaluate(Expression expr, _EvaluationContext arg) async {
     try {
       return await expr.accept(const _ExpressionEvaluator(), arg);
-    } catch (e) {
+    } on Object catch (e) {
       if (e is! EvaluationException) {
         throw EvaluationException(e, expr);
       }
@@ -219,7 +219,7 @@ class _ExpressionEvaluator
       Expression expression, _EvaluationContext ctx) async {
     try {
       return await expression.accept(this, ctx);
-    } catch (e) {
+    } on Object catch (e) {
       if (e is! EvaluationException) {
         throw EvaluationException(e, expression);
       }

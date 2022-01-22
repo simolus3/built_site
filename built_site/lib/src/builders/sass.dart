@@ -22,8 +22,8 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:build/build.dart';
-import 'package:sass/sass.dart';
 import 'package:path/path.dart' show url;
+import 'package:sass/sass.dart';
 
 /// A `Builder` to compile `.css` files from `.scss` or `.sass` source using
 /// the Dart implementation of Sass.

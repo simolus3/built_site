@@ -135,7 +135,7 @@ class _HighlightingVisitor extends RecursiveAstVisitor<void> {
 
   void _visitChildrenExcept(AstNode parent, AstNode? ignore) {
     for (final child in parent.childNodes) {
-      if (child != ignore && child is AstNode) {
+      if (child != ignore) {
         child.accept(this);
       }
     }
@@ -421,6 +421,15 @@ class _HighlightingVisitor extends RecursiveAstVisitor<void> {
   }
 
   @override
+  void visitNamedType(NamedType node) {
+    final name = node.name.name;
+    final probablyBuiltIn = !_startsWithUppercase.hasMatch(name);
+    _reportLeaf(node.name, probablyBuiltIn ? 'built_in' : 'type');
+
+    _visitChildrenExcept(node, node.name);
+  }
+
+  @override
   void visitNullLiteral(NullLiteral node) {
     _builtinLeaf(node);
   }
@@ -524,15 +533,6 @@ class _HighlightingVisitor extends RecursiveAstVisitor<void> {
     _keywordLeaf(node.tryKeyword);
     _keywordLeaf(node.finallyKeyword);
     super.visitTryStatement(node);
-  }
-
-  @override
-  void visitTypeName(TypeName node) {
-    final name = node.name.name;
-    final probablyBuiltIn = !_startsWithUppercase.hasMatch(name);
-    _reportLeaf(node.name, probablyBuiltIn ? 'built_in' : 'type');
-
-    _visitChildrenExcept(node, node.name);
   }
 
   @override

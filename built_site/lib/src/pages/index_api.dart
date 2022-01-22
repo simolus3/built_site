@@ -25,10 +25,10 @@ class IndexApi {
     final foundSections = <AssetId, Section>{};
     final foundPages = <AssetId, IndexedPage>{};
 
-    final sections = encoded['sections'] as List;
+    final sections = encoded['sections']! as List;
     Section? root;
     for (final section in sections.cast<Map<String, Object?>>()) {
-      final index = AssetId.parse(section['home'] as String);
+      final index = AssetId.parse(section['home']! as String);
       final parent = section['parent'] as String?;
       final parentSection =
           parent == null ? null : foundSections[AssetId.parse(parent)];
@@ -38,7 +38,7 @@ class IndexApi {
       root ??= newSection;
     }
 
-    final pages = encoded['pages'] as List;
+    final pages = encoded['pages']! as List;
     for (final page in pages.cast<String>()) {
       final metaId = AssetId.parse(page);
       final document = Document.fromJson(

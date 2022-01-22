@@ -2,8 +2,8 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:build/build.dart';
-import 'package:source_span/source_span.dart';
 import 'package:path/path.dart' show url;
+import 'package:source_span/source_span.dart';
 
 import '../pages/front_matter.dart';
 

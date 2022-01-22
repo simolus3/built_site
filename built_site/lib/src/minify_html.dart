@@ -1,7 +1,7 @@
 import 'package:charcode/ascii.dart';
-import 'package:html/parser.dart';
 import 'package:html/dom.dart';
 import 'package:html/dom_parsing.dart' show isVoidElement, htmlSerializeEscape;
+import 'package:html/parser.dart';
 
 /// Parses [input] as an html document and removes unecessary whitespace.
 String minifyHtml(String input) {
@@ -38,7 +38,6 @@ class _MinifyingVisitor {
           break;
         }
 
-        el.attributes;
         out.write('<${el.localName}');
         el.attributes.forEach((key, v) {
           out.write(' ');
@@ -66,20 +65,23 @@ class _MinifyingVisitor {
     var hasWhitespace = false;
     var hadNonWhitespace = false;
 
+    final buffer = StringBuffer();
     for (final char in text.codeUnits) {
       if (_whitespace.contains(char)) {
         hasWhitespace = !trimStart | hadNonWhitespace;
       } else {
         if (hasWhitespace) {
-          out.writeCharCode($space);
+          buffer.writeCharCode($space);
           hasWhitespace = false;
         }
-        out.writeCharCode(char);
+        buffer.writeCharCode(char);
         hadNonWhitespace = true;
       }
     }
 
-    if (hasWhitespace && !trimEnd) out.writeCharCode($space);
+    if (hasWhitespace && !trimEnd) buffer.writeCharCode($space);
+
+    out.write(htmlSerializeEscape(buffer.toString()));
   }
 
   void visitList(NodeList list) {
