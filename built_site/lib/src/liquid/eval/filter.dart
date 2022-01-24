@@ -72,10 +72,6 @@ Object? $default(Object? input, List<Object?> args) {
   return input;
 }
 
-Object? endsWith(Object? input, List<Object?> args) {
-  return input.toString().endsWith(args.first.toString());
-}
-
 Object? dividedBy(Object? input, List<Object?> args) {
   final numerator = _toNum(input);
   final divisor = _toNum(args.first);
@@ -89,6 +85,14 @@ Object? dividedBy(Object? input, List<Object?> args) {
 
 Object? downcase(Object? input, List<Object?> args) {
   return input.toString().toLowerCase();
+}
+
+Object? endsWith(Object? input, List<Object?> args) {
+  return input.toString().endsWith(args.first.toString());
+}
+
+Object? floor(Object? input, List<Object?> args) {
+  return _toNum(input).floor();
 }
 
 Object? get(Object? input, List<Object?> args) {
@@ -110,6 +114,22 @@ Object? markdownify(Object? input, List<Object?> args) {
   final inline = args.any((element) => element == 'inline');
   final data = md.parse(input.toString(), inline: inline);
   return md.renderToHtml(data);
+}
+
+Object? minus(Object? input, List<Object?> args) {
+  return _toNum(input) - _toNum(args[0]);
+}
+
+Object? modulo(Object? input, List<Object?> args) {
+  return _toNum(input) % _toNum(args[0]);
+}
+
+Object? plus(Object? input, List<Object?> args) {
+  return _toNum(input) + _toNum(args[0]);
+}
+
+Object? round(Object? input, List<Object?> args) {
+  return _toNum(input).round();
 }
 
 Object? sort(Object? input, List<Object?> args) {
@@ -159,7 +179,14 @@ Object? urlEncode(Object? input, List<Object?> args) {
   return Uri.encodeFull(input.toString());
 }
 
-const Map<String, Filter> filters = {
+Object? Function(Object?, List<Object?>) _binaryMath(
+    Object? Function(num a, num b) compute) {
+  return (input, args) {
+    return compute(_toNum(input), _toNum(args[0]));
+  };
+}
+
+Map<String, Filter> filters = {
   'abs': abs,
   'append': append,
   'at_least': atLeast,
@@ -172,16 +199,32 @@ const Map<String, Filter> filters = {
   'default': $default,
   'divided_by': dividedBy,
   'downcase': downcase,
+  'floor': floor,
   'endsWith': endsWith,
+  'length': (input, args) {
+    if (input is String) {
+      return input.length;
+    } else if (input is List) {
+      return input.length;
+    }
+  },
   'get': get,
   'json_decode': jsonDecode,
   'lower': downcase,
   'map': map,
   'markdownify': markdownify,
+  'minus': minus,
+  'modulo': modulo,
+  'plus': plus,
+  'round': round,
   'startsWith': startsWith,
   'sort': sort,
   'times': times,
   'upcase': upcase,
   'url_decode': urlDecode,
   'url_encode': urlEncode,
+  'lt': _binaryMath((a, b) => a < b),
+  'lte': _binaryMath((a, b) => a = b),
+  'gt': _binaryMath((a, b) => a > b),
+  'gte': _binaryMath((a, b) => a >= b),
 };

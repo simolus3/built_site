@@ -1,6 +1,6 @@
 name: docsy
 description: Port of docsy to built_site
-version: 0.2.1
+version: 0.2.2
 
 environment:
   sdk: '>=2.12.0 <3.0.0'
@@ -11,7 +11,7 @@ dependencies:
     hosted:
       url: https://simonbinder.eu
       name: built_site
-    version: ^0.2.0
+    version: ^0.2.5
   build_config: ^1.0.0
 
 dependency_overrides:
