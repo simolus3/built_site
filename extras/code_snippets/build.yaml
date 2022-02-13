@@ -1,0 +1,7 @@
+builders:
+  code_snippets:
+    import: "package:code_snippets/builder.dart"
+    builder_factories: ["CodeExcerptBuilder.new"]
+    build_extensions: {"": [".excerpt.json"]}
+    build_to: cache
+    auto_apply: dependents
