@@ -91,8 +91,8 @@ class HighlightRenderer {
         if (lastInChunk) break;
       }
 
-      text(highlighter.file
-          .span(offset, highlighter.file.getOffset(chunk.endLineExclusive)));
+      text(highlighter.file.span(
+          offset, highlighter.file.getOffset(chunk.endLineExclusive) - 1));
 
       last = chunk;
     }

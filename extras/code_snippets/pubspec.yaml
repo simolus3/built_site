@@ -1,6 +1,6 @@
 name: code_snippets
 description: Experimental builder for dealing with code snippets.
-version: 0.0.1
+version: 0.0.3
 publish_to: none
 
 environment:

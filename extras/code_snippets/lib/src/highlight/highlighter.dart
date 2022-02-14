@@ -1,4 +1,3 @@
-import 'package:meta/meta.dart';
 import 'package:source_span/source_span.dart';
 
 import 'regions.dart';
@@ -14,4 +13,11 @@ abstract class Highlighter {
   void report(HighlightRegion region) {
     foundRegions.add(region);
   }
+}
+
+class NullHighlighter extends Highlighter {
+  NullHighlighter(SourceFile file) : super(file);
+
+  @override
+  void highlight() {}
 }

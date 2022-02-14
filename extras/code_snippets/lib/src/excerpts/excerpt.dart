@@ -40,7 +40,15 @@ class ContinousRegion {
   final int startLine;
   final int endLineExclusive;
 
-  ContinousRegion(this.startLine, this.endLineExclusive);
+  /// The directives introducing this region.
+  ///
+  /// The [start] directive is only null for the full region covering the entire
+  /// file. The [end] directive is only null if a region was not explicitly
+  /// ended with a `#docendregion` directive.
+  final Directive? start, end;
+
+  ContinousRegion(this.startLine, this.endLineExclusive,
+      [this.start, this.end]);
 
   @override
   int get hashCode => Object.hash(startLine, endLineExclusive);
@@ -58,7 +66,9 @@ class _PendingRegion {
   final String excerpt;
   final int startLine;
 
-  _PendingRegion(this.excerpt, this.startLine);
+  final Directive? start;
+
+  _PendingRegion(this.excerpt, this.startLine, this.start);
 }
 
 class Excerpter {
@@ -94,7 +104,10 @@ class Excerpter {
     }
 
     // End all regions at the end
-    _openExcerpts.forEach(_closePending);
+    for (final open in _openExcerpts) {
+      // Don't warn for empty regions if the second-last line is a directive
+      _closePending(open, allowEmpty: open.start == null);
+    }
   }
 
   void _processLine() {
@@ -121,9 +134,10 @@ class Excerpter {
       final pending = _openExcerpts.toList();
       for (final open in pending) {
         if (open.startLine <= _lineIdx) {
-          _closePending(open);
+          _closePending(open, allowEmpty: true);
           _openExcerpts.remove(open);
-          _openExcerpts.add(_PendingRegion(open.excerpt, _lineIdx + 1));
+          _openExcerpts
+              .add(_PendingRegion(open.excerpt, _lineIdx + 1, open.start));
         }
       }
     }
@@ -193,15 +207,19 @@ class Excerpter {
     _warn(msg('region$s'));
   }
 
-  void _closePending(_PendingRegion pending) {
+  void _closePending(_PendingRegion pending, {bool allowEmpty = false}) {
     final excerpt = excerpts[pending.excerpt];
     if (excerpt == null) return;
 
     if (pending.startLine == _lineIdx) {
-      _warnRegions(
-        [pending.excerpt],
-        (regions) => 'empty $regions',
-      );
+      if (!allowEmpty) {
+        _warnRegions(
+          [pending.excerpt],
+          (regions) => 'empty $regions',
+        );
+      }
+
+      return;
     }
 
     excerpt.regions.add(ContinousRegion(pending.startLine, _lineIdx));
@@ -209,18 +227,17 @@ class Excerpter {
 
   /// Registers [name] as an open excerpt.
   ///
-  /// If [name] is a new excerpt, then its value in
-  /// [excerpts] is set to the empty list.
-  ///
   /// Returns false iff name was already open
-  bool _excerptStart(String name) {
+  bool _excerptStart(String name, [Directive? directive]) {
     excerpts.putIfAbsent(name, () => Excerpt(name, []));
 
     if (_openExcerpts.any((e) => e.excerpt == name)) {
       return false; // Already open!
     }
 
-    _openExcerpts.add(_PendingRegion(name, _lineIdx + 1));
+    // Start region on next line if the current line is a directive.
+    _openExcerpts.add(_PendingRegion(
+        name, directive == null ? _lineIdx : _lineIdx + 1, directive));
     return true;
   }
 

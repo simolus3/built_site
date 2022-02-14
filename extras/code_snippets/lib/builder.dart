@@ -11,14 +11,42 @@ import 'src/highlight/highlighter.dart';
 import 'src/highlight/languages/dart.dart';
 import 'src/highlight/render.dart';
 
+export 'src/excerpts/excerpt.dart';
+
 const excerptLineLeftBorderChar = '|';
 
 class CodeExcerptBuilder implements Builder {
-  static const outputExtension = '.excerpt.json';
+  bool shouldEmitFor(AssetId input, Excerpter excerpts) {
+    return excerpts.containsDirectives;
+  }
 
-  final BuilderOptions? options;
+  Future<Highlighter?> highlighterFor(
+      AssetId assetId, String content, BuildStep buildStep) async {
+    switch (assetId.extension) {
+      case '.dart':
+        final source = SourceFile.fromString(content, url: assetId.uri);
+        final library = await buildStep.inputLibrary;
+        var resolvedUnit =
+            await library.session.getResolvedUnit(library.source.fullName);
+        CompilationUnit unit;
 
-  CodeExcerptBuilder([this.options]);
+        if (resolvedUnit is ResolvedUnitResult) {
+          unit = resolvedUnit.unit;
+        } else {
+          unit = await buildStep.resolver.compilationUnitFor(assetId);
+        }
+
+        return DartHighlighter(source, unit);
+    }
+
+    return null;
+  }
+
+  String Function(
+          Excerpt excerpt, ContinousRegion last, ContinousRegion upcoming)
+      writePlasterFor(AssetId id) {
+    return (_, __, ___) => '';
+  }
 
   @override
   Future<void> build(BuildStep buildStep) async {
@@ -26,51 +54,34 @@ class CodeExcerptBuilder implements Builder {
     if (assetId.package.startsWith(r'$') || assetId.path.endsWith(r'$')) return;
 
     final content = await buildStep.readAsString(assetId);
-    final outputAssetId = assetId.addExtension(outputExtension);
+    final outputAssetId = buildStep.allowedOutputs.single;
 
     final excerpter = Excerpter(assetId.path, content)..weave();
     final excerpts = excerpter.excerpts;
 
-    if (excerpter.containsDirectives) {
+    if (shouldEmitFor(assetId, excerpter)) {
       final source = SourceFile.fromString(content, url: assetId.uri);
-      Highlighter? highlighter;
 
-      switch (assetId.extension) {
-        case '.dart':
-          final library = await buildStep.inputLibrary;
-          var resolvedUnit =
-              await library.session.getResolvedUnit(library.source.fullName);
-          CompilationUnit unit;
+      final highlighter = await highlighterFor(assetId, content, buildStep) ??
+          NullHighlighter(source);
+      highlighter.highlight();
 
-          if (resolvedUnit is ResolvedUnitResult) {
-            unit = resolvedUnit.unit;
-          } else {
-            unit = await buildStep.resolver.compilationUnitFor(assetId);
-          }
+      final results = <String, Object?>{};
+      final writePlaster = writePlasterFor(assetId);
 
-          highlighter = DartHighlighter(source, unit);
+      for (final excerpt in excerpts.values) {
+        final renderer = HighlightRenderer(highlighter, excerpt, writePlaster);
+        final html = renderer.renderHtml();
+
+        results[excerpt.name] = html;
       }
 
-      if (highlighter != null) {
-        highlighter.highlight();
-
-        final results = <String, Object?>{};
-
-        for (final excerpt in excerpts.values) {
-          final renderer =
-              HighlightRenderer(highlighter, excerpt, (_, __, ___) => '');
-          final html = renderer.renderHtml();
-
-          results[excerpt.name] = html;
-        }
-
-        await buildStep.writeAsString(outputAssetId, json.encode(results));
-      }
+      await buildStep.writeAsString(outputAssetId, json.encode(results));
     }
   }
 
   @override
   Map<String, List<String>> get buildExtensions => {
-        '': [outputExtension]
+        '': ['.excerpt.json'],
       };
 }

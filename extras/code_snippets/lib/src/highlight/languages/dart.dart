@@ -39,62 +39,11 @@ class DartHighlighter extends Highlighter {
 }
 
 class _HighlightingVisitor extends RecursiveAstVisitor<void> {
+  static final RegExp _startsWithUppercase = RegExp('^[A-Z]');
+
   final DartHighlighter highlighter;
 
   _HighlightingVisitor(this.highlighter);
-
-  void _leaf(SyntacticEntity? entity, RegionType type) {
-    if (entity != null) {
-      highlighter.report(HighlightRegion(
-          type, highlighter.file.span(entity.offset, entity.end)));
-    }
-  }
-
-  void _keyword(SyntacticEntity? entity) {
-    _leaf(entity, RegionType.keyword);
-  }
-
-  void _punctuation(SyntacticEntity? entity) {
-    _leaf(entity, RegionType.punctuation);
-  }
-
-  void _symbol(SyntacticEntity? entity) {
-    _leaf(entity, RegionType.symbol);
-  }
-
-  void _visitChildrenWithTitle(AstNode node, AstNode? title,
-      [RegionType titleType = RegionType.title]) {
-    for (final child in node.childNodes) {
-      if (child == title) {
-        _leaf(child, titleType);
-      } else {
-        child.accept(this);
-      }
-    }
-  }
-
-  void _reportMergedLeaf(Iterable<SyntacticEntity?> entities, RegionType type) {
-    final present = entities.whereType<SyntacticEntity>();
-    if (present.isEmpty) {
-      return; // no range to highlight
-    }
-
-    int? first;
-    int? last;
-
-    for (final entity in present) {
-      first = first == null ? entity.offset : min(entity.offset, first);
-      last = last == null ? entity.end : max(entity.end, last);
-    }
-
-    highlighter
-        .report(HighlightRegion(type, highlighter.file.span(first!, last)));
-  }
-
-  void _functionBody(FunctionBody body) {
-    _reportMergedLeaf([body.keyword, body.star], RegionType.keyword);
-    body.visitChildren(this);
-  }
 
   @override
   void visitAnnotation(Annotation node) {
@@ -134,15 +83,15 @@ class _HighlightingVisitor extends RecursiveAstVisitor<void> {
   }
 
   @override
-  void visitBlockFunctionBody(BlockFunctionBody node) {
-    _functionBody(node);
-  }
-
-  @override
   void visitBlock(Block node) {
     _punctuation(node.leftBracket);
     super.visitBlock(node);
     _punctuation(node.rightBracket);
+  }
+
+  @override
+  void visitBlockFunctionBody(BlockFunctionBody node) {
+    _functionBody(node);
   }
 
   @override
@@ -522,6 +471,18 @@ class _HighlightingVisitor extends RecursiveAstVisitor<void> {
   }
 
   @override
+  void visitSuperConstructorInvocation(SuperConstructorInvocation node) {
+    _leaf(node.superKeyword, RegionType.keyword);
+    super.visitSuperConstructorInvocation(node);
+  }
+
+  @override
+  void visitSuperExpression(SuperExpression node) {
+    _leaf(node.superKeyword, RegionType.keyword);
+    super.visitSuperExpression(node);
+  }
+
+  @override
   void visitSwitchCase(SwitchCase node) {
     _keyword(node.keyword);
     _punctuation(node.colon);
@@ -589,7 +550,58 @@ class _HighlightingVisitor extends RecursiveAstVisitor<void> {
     super.visitYieldStatement(node);
   }
 
-  static final RegExp _startsWithUppercase = RegExp('^[A-Z]');
+  void _functionBody(FunctionBody body) {
+    _reportMergedLeaf([body.keyword, body.star], RegionType.keyword);
+    body.visitChildren(this);
+  }
+
+  void _keyword(SyntacticEntity? entity) {
+    _leaf(entity, RegionType.keyword);
+  }
+
+  void _leaf(SyntacticEntity? entity, RegionType type) {
+    if (entity != null) {
+      highlighter.report(HighlightRegion(
+          type, highlighter.file.span(entity.offset, entity.end)));
+    }
+  }
+
+  void _punctuation(SyntacticEntity? entity) {
+    _leaf(entity, RegionType.punctuation);
+  }
+
+  void _reportMergedLeaf(Iterable<SyntacticEntity?> entities, RegionType type) {
+    final present = entities.whereType<SyntacticEntity>();
+    if (present.isEmpty) {
+      return; // no range to highlight
+    }
+
+    int? first;
+    int? last;
+
+    for (final entity in present) {
+      first = first == null ? entity.offset : min(entity.offset, first);
+      last = last == null ? entity.end : max(entity.end, last);
+    }
+
+    highlighter
+        .report(HighlightRegion(type, highlighter.file.span(first!, last)));
+  }
+
+  void _symbol(SyntacticEntity? entity) {
+    _leaf(entity, RegionType.symbol);
+  }
+
+  void _visitChildrenWithTitle(AstNode node, AstNode? title,
+      [RegionType titleType = RegionType.title]) {
+    for (final child in node.childNodes) {
+      if (child == title) {
+        _leaf(child, titleType);
+      } else {
+        child.accept(this);
+      }
+    }
+  }
 }
 
 extension on AstNode {
