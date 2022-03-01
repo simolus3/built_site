@@ -1,3 +1,4 @@
+import 'package:build/build.dart';
 import 'package:code_snippets/src/highlight/regions.dart';
 import 'package:source_span/source_span.dart';
 
@@ -17,6 +18,21 @@ class HighlightRenderer {
   String renderHtml() {
     highlighter.foundRegions.sort((a, b) => a.source.compareTo(b.source));
 
+    // Drop intersecting regions (which really shouldn't exist).
+    var largestOffset = 0;
+    final regions = <HighlightRegion>[];
+
+    for (final region in highlighter.foundRegions) {
+      final start = region.source.start.offset;
+      if (start < largestOffset) {
+        log.warning('Intersecting highlight regions at ${region.source.text}.');
+      } else {
+        regions.add(region);
+      }
+
+      largestOffset = region.source.end.offset;
+    }
+
     final buffer = StringBuffer();
 
     void text(FileSpan span) {
@@ -29,7 +45,6 @@ class HighlightRenderer {
       buffer.write('</span>');
     }
 
-    final regions = highlighter.foundRegions;
     var currentRegion = 0;
     ContinousRegion? last;
 

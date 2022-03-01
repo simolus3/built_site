@@ -67,13 +67,11 @@ class _HighlightingVisitor extends RecursiveAstVisitor<void> {
   @override
   void visitAssertInitializer(AssertInitializer node) {
     visitAssert(node);
-    super.visitAssertInitializer(node);
   }
 
   @override
   void visitAssertStatement(AssertStatement node) {
     visitAssert(node);
-    super.visitAssertStatement(node);
   }
 
   @override
