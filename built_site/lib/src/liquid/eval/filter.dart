@@ -128,6 +128,10 @@ Object? plus(Object? input, List<Object?> args) {
   return _toNum(input) + _toNum(args[0]);
 }
 
+Object? reverse(Object? input, List<Object?> args) {
+  return (input! as List).reversed;
+}
+
 Object? round(Object? input, List<Object?> args) {
   return _toNum(input).round();
 }
@@ -216,6 +220,7 @@ Map<String, Filter> filters = {
   'minus': minus,
   'modulo': modulo,
   'plus': plus,
+  'reverse': reverse,
   'round': round,
   'startsWith': startsWith,
   'sort': sort,
