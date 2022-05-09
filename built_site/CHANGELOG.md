@@ -1,3 +1,8 @@
+## 0.2.7
+
+- Support [whitespace control](https://shopify.github.io/liquid/basics/whitespace/)
+  in Liquid filters.
+
 ## 0.2.6
 
 - Add `reverse` filter for lists

@@ -35,8 +35,8 @@ class TableOfContents {
       } else {
         while (level < levelStack.last) {
           // Nested level closes
-          buffer.write(levelStack.isEmpty ? '</ul>' : '</ul></li>');
           levelStack.removeLast();
+          buffer.write(levelStack.isEmpty ? '</ul>' : '</ul></li>');
         }
       }
 
@@ -45,8 +45,8 @@ class TableOfContents {
     }
 
     while (levelStack.isNotEmpty) {
-      buffer.write(levelStack.isEmpty ? '</ul>' : '</ul></li>');
       levelStack.removeLast();
+      buffer.write(levelStack.isEmpty ? '</ul>' : '</ul></li>');
     }
 
     buffer.write('</nav>');

@@ -37,6 +37,12 @@ void main() {
                 'parent': 'a|pages/index.page_meta',
               },
             ],
+            'pages': [
+              'a|pages/foo/not/deeply/nested/index.page_meta',
+              'a|pages/index.page_meta',
+              'a|pages/foo/index.page_meta',
+              'a|pages/bar/index.page_meta',
+            ],
           },
         )
       },

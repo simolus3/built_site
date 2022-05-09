@@ -6,7 +6,7 @@ void main() {
   test('generates flat ToC', () {
     const md = '''
 ## foo
-      
+
 ## bar
 
 ## baz
@@ -26,7 +26,7 @@ void main() {
   test('generates nested ToC', () {
     const md = '''
 # top
-      
+
 ## second
 
 ### third
@@ -45,13 +45,13 @@ void main() {
       toc.formatToc(),
       '<nav id="TableOfContents"><ul>'
       '<li><a href="#top">top</a></li>'
-      '<ul><li><a href="#second">second</a></li>'
-      '<ul><li><a href="#third">third</a></li>'
-      '<ul><li><a href="#fourth">fourth</a></li>'
-      '<ul><li><a href="#fifth">fifth</a></li>'
-      '</ul></ul><li><a href="#another-third">another third</a></li>'
-      '</ul><li><a href="#second-b">second (b)</a></li>'
-      '</ul></ul></nav>',
+      '<li><ul><li><a href="#second">second</a></li>'
+      '<li><ul><li><a href="#third">third</a></li>'
+      '<li><ul><li><a href="#fourth">fourth</a></li>'
+      '<li><ul><li><a href="#fifth">fifth</a></li>'
+      '</ul></li></ul></li><li><a href="#another-third">another third</a></li>'
+      '</ul></li><li><a href="#second-b">second (b)</a></li>'
+      '</ul></li></ul></nav>',
     );
   });
 }

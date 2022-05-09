@@ -123,7 +123,7 @@ class Parser {
   }
 
   Text _parseText() {
-    return Text(_expect(TokenType.text));
+    return Text(_expect(TokenType.text) as TextToken);
   }
 
   ObjectTag _parseObject() {

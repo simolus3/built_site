@@ -14,6 +14,9 @@ class Lexer {
   late int _startPositionOfToken;
   bool _isInObjectOrTag = false;
 
+  /// Whether the last token was a `-%}`
+  bool _isStrippingNextWhitespace = false;
+
   Lexer(this.input, this.chars, [this._position = 0]);
 
   FileSpan get _tokenSpan => input.span(_startPositionOfToken, _position);
@@ -35,11 +38,15 @@ class Lexer {
     if (isAtEnd) return Token.eof;
 
     _startPositionOfToken = _position;
-    var char = _getAndAdvance();
+    var char = _get();
 
     if (_isInObjectOrTag) {
+      // Only set when we leave a tag with `-%}`
+      _isStrippingNextWhitespace = false;
+      _position++; // we're handling char here, so peek at the next one
+
       // Skip whitespace
-      while (char == $space) {
+      while (_isWhitespace(char)) {
         _startPositionOfToken = _position;
         char = _getAndAdvance();
       }
@@ -105,6 +112,29 @@ class Lexer {
         case $9:
           return _number(char);
         case $minus:
+          // -%} would close a tag and strip trailing whitespace
+          if (_check($percent)) {
+            _position++;
+            if (_check($close_brace)) {
+              _position++;
+              _isStrippingNextWhitespace = true;
+              _isInObjectOrTag = false;
+              return Token(_tokenSpan, TokenType.endTag);
+            }
+
+            _invalidToken(r'Expected `-$}`, but only got `-%`');
+          } else if (_check($close_brace)) {
+            _position++;
+            if (_check($close_brace)) {
+              _position++;
+              _isStrippingNextWhitespace = true;
+              _isInObjectOrTag = false;
+              return Token(_tokenSpan, TokenType.endObject);
+            }
+
+            _invalidToken(r'Expected `-}}`, but only got `-}`');
+          }
+
           return Token(_tokenSpan, TokenType.minus);
       }
 
@@ -116,17 +146,24 @@ class Lexer {
       _invalidToken();
     } else {
       if (char == $open_brace) {
+        _position++; // consume `{`
+
         final next = _getAndAdvance();
         if (next == $open_brace) {
-          // {{, starts an object
+          // {{ or {{- starts an object
           _isInObjectOrTag = true;
+          if (_check($minus)) _position++;
+
           return Token(_tokenSpan, TokenType.startObject);
         } else if (next == $percent) {
-          // {%, starts a tag
+          // {% or {%- starts a tag
           _isInObjectOrTag = true;
+          if (_check($minus)) _position++;
+
           return Token(_tokenSpan, TokenType.startTag);
         }
       }
+
       return _text();
     }
   }
@@ -192,11 +229,50 @@ class Lexer {
   }
 
   Token _text() {
+    final content = StringBuffer();
+    var lastNonWhitespaceIndexInContent = -1;
+    var needsToStripTrailingWhitespace = false;
+    var isSkippingLeadingWhitespace = _isStrippingNextWhitespace;
+
+    while (!isAtEnd) {
+      final char = _get();
+      final isWhitespace = _isWhitespace(char);
+
+      if (isSkippingLeadingWhitespace && isWhitespace) {
+        _position++;
+        continue;
+      } else if (char == $openBrace) {
+        // This token stops at a left brace either way, but we need to check for
+        // `{%-` or `{{-` to see whether trailing whitespace should be stripped.
+        needsToStripTrailingWhitespace =
+            _position + 2 < chars.length && chars[_position + 2] == $minus;
+        break;
+      } else {
+        isSkippingLeadingWhitespace = false;
+        _position++;
+        content.writeCharCode(char);
+
+        if (!isWhitespace) {
+          lastNonWhitespaceIndexInContent = content.length - 1;
+        }
+      }
+    }
+
     while (!isAtEnd && _get() != $open_brace) {
       _position++;
     }
 
-    return Token(_tokenSpan, TokenType.text);
+    // This only applies to the immediate next text token
+    _isStrippingNextWhitespace = false;
+    var value = content.toString();
+    if (needsToStripTrailingWhitespace) {
+      if (lastNonWhitespaceIndexInContent < 0) {
+        value = '';
+      } else {
+        value = value.substring(0, lastNonWhitespaceIndexInContent + 1);
+      }
+    }
+    return TextToken(_tokenSpan, value);
   }
 
   bool _startsIdentifier(int char) {
@@ -208,6 +284,10 @@ class Lexer {
 
   bool _continuesIdentifier(int char) {
     return _startsIdentifier(char) || char >= $0 && char <= $9;
+  }
+
+  bool _isWhitespace(int char) {
+    return char == $space || char == $tab || char == $lf || char == $cr;
   }
 
   static const digits = [$0, $1, $2, $3, $4, $5, $6, $7, $8, $9];

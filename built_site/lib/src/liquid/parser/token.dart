@@ -38,6 +38,17 @@ class Token {
   String get lexeme => span!.text;
 }
 
+class TextToken extends Token {
+  /// The value of this text token.
+  ///
+  /// This is not necessary the same as the [lexeme] as a preceding or following
+  /// token may apply [whitespace control](https://shopify.github.io/liquid/basics/whitespace/),
+  /// which would remove leading or trailing whitespace in this token.
+  final String value;
+
+  TextToken(FileSpan span, this.value) : super(span, TokenType.text);
+}
+
 class StringLiteralToken extends Token {
   final String value;
 

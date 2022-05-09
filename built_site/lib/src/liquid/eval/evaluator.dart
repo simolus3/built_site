@@ -39,7 +39,7 @@ class TemplateEvaluator
   Future<Object?> _evaluate(Expression expr, _EvaluationContext arg) async {
     try {
       return await expr.accept(const _ExpressionEvaluator(), arg);
-    } on Object catch (e) {
+    } on Object catch (e, s) {
       if (e is! EvaluationException) {
         throw EvaluationException(e, expr);
       }
@@ -194,7 +194,7 @@ class TemplateEvaluator
 
   @override
   Future<void> visitText(Text node, _EvaluationContext arg) {
-    arg.buffer.write(node.token.lexeme);
+    arg.buffer.write(node.token.value);
     return Future.value();
   }
 }

@@ -153,7 +153,7 @@ class ObjectTag extends TemplateComponent {
 
 /// Simple text node that will just emit raw text.
 class Text extends TemplateComponent {
-  final Token token;
+  final TextToken token;
 
   Text(this.token)
       : assert(token.type == TokenType.text, 'Invalid type for text token');
