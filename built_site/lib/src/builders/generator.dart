@@ -19,8 +19,9 @@ final _cache = Resource(() => _BuildCache());
 
 class SiteGenerator extends Builder {
   final String environment;
+  final BuilderOptions options;
 
-  SiteGenerator(this.environment);
+  SiteGenerator(this.environment, this.options);
 
   @override
   Map<String, List<String>> get buildExtensions {
@@ -88,6 +89,7 @@ class SiteGenerator extends Builder {
           'base_url': config.baseUrl,
           'built_site': {
             'version': packageVersion,
+            'config': options.config,
           },
           'root_section': () async {
             final index = await loadIndex();

@@ -1,3 +1,5 @@
-## 1.0.0
+## 0.2.6
 
-- Initial version, created by Stagehand
+- Add `reverse` filter for lists
+- Builder options passed to `built_site:built_site` are now available to pages
+  via `built_site.config`.

@@ -28,7 +28,7 @@ Builder hash(BuilderOptions options) {
 }
 
 Builder generator(BuilderOptions options) {
-  return SiteGenerator(options.config['environment'] as String);
+  return SiteGenerator(options.config['environment'] as String, options);
 }
 
 Builder localThemeIndex(BuilderOptions options) => const LocalThemeIndexer();

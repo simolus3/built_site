@@ -18,6 +18,7 @@ When rendering a page, you have access to the following variables:
 - `base_url` (string): The effective base url from the configuration
 - `built_site` (dict):
   - `version` (string): The version of `built_site` used to generate the page
+  - `config` (dict): All options passed to the `built_site:built_site` builder
 - `root_section` (dict): The section of the root pages
 - `first_section` (dict): The first section under the root section that's an ancestor of the current page.
   This is equivalent to `root_section` iff the current page is in the root section

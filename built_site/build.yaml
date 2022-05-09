@@ -4,13 +4,13 @@
 # We have a fairly complex build setup to get around the restriction that
 # regular builders can only emit a fixed amount of files relative to their
 # primary input. A common workaround is to chunk files up into an archive and
-# later extract that through a post-process builder. We do that for static 
-# content contributed by themes, but we should avoid it in general to enable 
+# later extract that through a post-process builder. We do that for static
+# content contributed by themes, but we should avoid it in general to enable
 # fast and incremental rebuilds. In general, we prefer to have many small build
 # steps.
-# 
+#
 # Themes and the website itself can declare static content in static/. We need
-# to copy that to web/, which is the directory served and built. For this 
+# to copy that to web/, which is the directory served and built. For this
 # purpose, we're creating a tar file of all the static content crawled from
 # this package and its themes. This is fairly expensive, and we only want to do
 # that when themes really changed. So, we have a three-step build setup just
@@ -22,7 +22,7 @@
 #      This is an extra builder because builders can only glob in the package
 #      on which they operate.
 #  2.  The index_themes builder takes the output from 1. as input and emits a
-#      tar file of static content crawled across themes. It also creates a 
+#      tar file of static content crawled across themes. It also creates a
 #      unified file of all i18n keys.
 #  3.  The copy_static post_process builder extracts the tar file into the web/
 #      directory of the root package.
@@ -68,7 +68,7 @@ builders:
     import: "package:built_site/builders.dart"
     builder_factories: ["localThemeIndex"]
     runs_before: ['|index_themes']
-  
+
   # Collects all resources found by local_theme_indexer into a single tar file
   # for resources and into a single json for translation keys.
   index_themes:
@@ -88,7 +88,7 @@ builders:
   # Metadata extractor to build indices and overviews
   metadata:
     auto_apply: dependents
-    build_extensions: 
+    build_extensions:
       '.md': ['.page_meta']
       '.html': ['.page_meta']
     build_to: cache
@@ -108,7 +108,7 @@ builders:
     builder_factories: ["index"]
     runs_before: ["|built_site"]
     is_optional: true
-  
+
   # Lazily create a hash of assets when needed. This is used for the "asset"
   # filter.
   hash:
@@ -132,7 +132,7 @@ builders:
         environment: "dev"
       release_options:
         environment: "prod"
-  
+
   # Independent builder transforming sass/scss files to css
   sass_builder:
     import: "package:built_site/builders.dart"
@@ -161,7 +161,7 @@ post_process_builders:
     builder_factory: "extractStatic"
     import: "package:built_site/builders.dart"
     input_extensions: ["static_content.tar"]
-  
+
   # Applied by other builders: Deletes sources that shouldn't appear in the output
   delete_sources:
     builder_factory: "deleteSources"
