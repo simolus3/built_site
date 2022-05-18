@@ -60,10 +60,10 @@ class SiteGenerator extends Builder {
     // Note that the metadata builder applies a default path if it hasn't
     // been overriden, so we'll always have something here.
     final path = frontMatter!.path!;
-    IndexApi? _index;
+    IndexApi? index;
 
     Future<IndexApi> loadIndex() async {
-      return _index ??= await IndexApi.load(buildStep);
+      return index ??= await IndexApi.load(buildStep);
     }
 
     Future<String> render(TemplateComponent component,

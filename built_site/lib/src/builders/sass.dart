@@ -161,7 +161,7 @@ class BuildImporter extends AsyncImporter {
 
   /// Like [_tryImport], but checks both `.sass` and `.scss` extensions.
   Future<List<AssetId>> _tryImportWithExtensions(String import) async =>
-      await _tryImport(import + '.sass') + await _tryImport(import + '.scss');
+      await _tryImport('$import.sass') + await _tryImport('$import.scss');
 
   /// Returns the [AssetId] for [import] and/or the partial with the same name,
   /// if either or both exists.
@@ -193,7 +193,6 @@ class BuildImporter extends AsyncImporter {
     if (imports.isEmpty) return null;
     if (imports.length == 1) return imports.first;
 
-    throw FormatException('It is not clear which file to import. Found:\n' +
-        imports.map((import) => '  ${url.prettyUri(import.uri)}').join('\n'));
+    throw FormatException('It is not clear which file to import. Found:\n${imports.map((import) => '  ${url.prettyUri(import.uri)}').join('\n')}');
   }
 }

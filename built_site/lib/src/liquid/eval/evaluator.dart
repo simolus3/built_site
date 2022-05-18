@@ -10,6 +10,8 @@ import '../parser/token.dart';
 import 'filter.dart';
 import 'utils.dart' as utils;
 
+// ignore_for_file: library_private_types_in_public_api
+
 class TemplateEvaluator
     extends ComponentVisitor<_EvaluationContext, Future<void>> {
   final TemplateResolver resolver;
@@ -39,11 +41,12 @@ class TemplateEvaluator
   Future<Object?> _evaluate(Expression expr, _EvaluationContext arg) async {
     try {
       return await expr.accept(const _ExpressionEvaluator(), arg);
-    } on Object catch (e, s) {
+    } on Object catch (e) {
       if (e is! EvaluationException) {
         throw EvaluationException(e, expr);
       }
     }
+    return null;
   }
 
   @override
@@ -224,6 +227,7 @@ class _ExpressionEvaluator
         throw EvaluationException(e, expression);
       }
     }
+    return null;
   }
 
   @override
@@ -379,7 +383,6 @@ class EvaluationException implements Exception {
     final span = node.span;
     if (span == null) return cause.toString();
 
-    return 'Error evaluating ${span.file.url}: \n' +
-        span.message(cause.toString());
+    return 'Error evaluating ${span.file.url}: \n${span.message(cause.toString())}';
   }
 }

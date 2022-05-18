@@ -22,7 +22,7 @@ class HashBuilder implements Builder {
 
     final asJson = json.encode({'algo': 'sha-512', 'digest': encoded});
     final outputId =
-        AssetId(inputId.package, inputId.path + '.built_site_hash');
+        AssetId(inputId.package, '${inputId.path}.built_site_hash');
     await buildStep.writeAsString(outputId, asJson);
   }
 }

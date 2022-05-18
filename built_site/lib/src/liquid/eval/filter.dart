@@ -211,6 +211,7 @@ Map<String, Filter> filters = {
     } else if (input is List) {
       return input.length;
     }
+    return null;
   },
   'get': get,
   'json_decode': jsonDecode,

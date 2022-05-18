@@ -52,6 +52,7 @@ class _SectionTreeNode {
   // accurate tree.
   AssetId? page;
 
+  // ignore: unused_element, https://github.com/dart-lang/sdk/issues/49007
   _SectionTreeNode(this.parent, [this.page]);
 
   void insert(AssetId id) {

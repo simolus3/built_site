@@ -1,3 +1,7 @@
+## 0.2.8
+
+- Support latest analyzer version
+
 ## 0.2.7
 
 - Support [whitespace control](https://shopify.github.io/liquid/basics/whitespace/)
