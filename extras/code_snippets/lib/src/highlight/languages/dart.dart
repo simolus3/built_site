@@ -153,7 +153,7 @@ class _HighlightingVisitor extends RecursiveAstVisitor<void> {
   @override
   void visitConstructorReference(ConstructorReference node) {
     final name = node.constructorName;
-    name.type2.accept(this);
+    name.type.accept(this);
     _leaf(name.name, RegionType.invokedFunctionTitle);
   }
 

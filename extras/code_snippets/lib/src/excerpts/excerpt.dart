@@ -194,16 +194,16 @@ class Excerpter {
   }
 
   void _warnRegions(
-    List<String> _regions,
+    List<String> regions,
     String Function(String) msg,
   ) {
-    if (_regions.isEmpty) return;
-    final regions = _regions.join(', ');
+    if (regions.isEmpty) return;
+    final joinedRegions = regions.join(', ');
     final s = regions.isEmpty
         ? ''
-        : _regions.length > 1
-            ? 's ($regions)'
-            : ' $regions';
+        : regions.length > 1
+            ? 's ($joinedRegions)'
+            : ' $joinedRegions';
     _warn(msg('region$s'));
   }
 
