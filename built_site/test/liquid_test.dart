@@ -105,4 +105,21 @@ line 1, column 4 of package:foo/bar.html: Bad state: expected
       )),
     );
   });
+
+  test('can emit left brace as text', () {
+    final template = TemplateResolver.parseString('''
+{{ "test" }}
+{}
+{
+{ { }}
+''');
+
+    final evaluator = TemplateEvaluator(StubAssetReader(), resolver);
+    expect(evaluator.render(template), completion('''
+test
+{}
+{
+{ { }}
+'''));
+  });
 }

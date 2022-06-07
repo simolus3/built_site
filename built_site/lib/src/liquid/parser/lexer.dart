@@ -146,7 +146,7 @@ class Lexer {
       _invalidToken();
     } else {
       if (char == $open_brace) {
-        _position++; // consume `{`
+        _position++; // to peek at the next char `{`
 
         final next = _getAndAdvance();
         if (next == $open_brace) {
@@ -162,6 +162,9 @@ class Lexer {
 
           return Token(_tokenSpan, TokenType.startTag);
         }
+
+        // Ok, not a recognized pattern. Rollback position and read as text.
+        _position--;
       }
 
       return _text();
@@ -242,19 +245,27 @@ class Lexer {
         _position++;
         continue;
       } else if (char == $openBrace) {
-        // This token stops at a left brace either way, but we need to check for
-        // `{%-` or `{{-` to see whether trailing whitespace should be stripped.
-        needsToStripTrailingWhitespace =
-            _position + 2 < chars.length && chars[_position + 2] == $minus;
-        break;
-      } else {
-        isSkippingLeadingWhitespace = false;
-        _position++;
-        content.writeCharCode(char);
+        // Does this start an `{{` or `{%` tag?
+        final isSpecialBrace = _position + 1 < chars.length &&
+            (chars[_position + 1] == $openBrace ||
+                chars[_position + 1] == $percent);
 
-        if (!isWhitespace) {
-          lastNonWhitespaceIndexInContent = content.length - 1;
+        if (isSpecialBrace) {
+          // This text token ends at that left brace either way, but we need to
+          // check for `{%-` or `{{-` to see whether trailing whitespace should
+          // be stripped.
+          needsToStripTrailingWhitespace =
+              _position + 2 < chars.length && chars[_position + 2] == $minus;
+          break;
         }
+      }
+
+      isSkippingLeadingWhitespace = false;
+      _position++;
+      content.writeCharCode(char);
+
+      if (!isWhitespace) {
+        lastNonWhitespaceIndexInContent = content.length - 1;
       }
     }
 
