@@ -16,6 +16,36 @@ export 'src/excerpts/excerpt.dart';
 const excerptLineLeftBorderChar = '|';
 
 class CodeExcerptBuilder implements Builder {
+  /// Whether common indendation should be removed when rendering text.
+  ///
+  /// If enabled, a highlight region like:
+  ///
+  /// ```
+  /// void myFunction() {
+  ///   // #docregion test
+  ///   fun1();
+  ///   fun2();
+  ///   // #enddocregion test
+  /// }
+  /// ```
+  ///
+  /// would be rendered like
+  ///
+  /// ```
+  /// fun1();
+  /// fun2();
+  /// ```
+  ///
+  /// If disabled (the default), it would be rendered as
+  ///
+  /// ```
+  ///  fun1();
+  ///  fun2();
+  /// ```
+  final bool dropIndendation;
+
+  CodeExcerptBuilder({this.dropIndendation = false});
+
   bool shouldEmitFor(AssetId input, Excerpter excerpts) {
     return excerpts.containsDirectives;
   }
@@ -45,7 +75,7 @@ class CodeExcerptBuilder implements Builder {
   String Function(
           Excerpt excerpt, ContinousRegion last, ContinousRegion upcoming)
       writePlasterFor(AssetId id) {
-    return (_, __, ___) => '';
+    return (_, __, ___) => '\n';
   }
 
   @override
@@ -70,7 +100,8 @@ class CodeExcerptBuilder implements Builder {
       final writePlaster = writePlasterFor(assetId);
 
       for (final excerpt in excerpts.values) {
-        final renderer = HighlightRenderer(highlighter, excerpt, writePlaster);
+        final renderer = HighlightRenderer(
+            highlighter, excerpt, writePlaster, dropIndendation);
         final html = renderer.renderHtml();
 
         results[excerpt.name] = html;

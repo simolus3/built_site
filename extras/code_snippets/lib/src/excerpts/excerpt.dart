@@ -27,9 +27,15 @@ class Excerpt {
 
   @override
   String toString() {
-    final lines = regions
-        .map((r) => '[${r.startLine}, ${r.endLineExclusive})')
-        .join(', ');
+    final lines = regions.map((r) {
+      final lines = '[${r.startLine}, ${r.endLineExclusive})';
+
+      if (r.indentation.isNotEmpty) {
+        return '$lines w/ ident ${r.indentation.length}';
+      } else {
+        return lines;
+      }
+    }).join(', ');
 
     return 'Region $name covering lines $lines';
   }
@@ -47,8 +53,10 @@ class ContinousRegion {
   /// ended with a `#docendregion` directive.
   final Directive? start, end;
 
+  final String indentation;
+
   ContinousRegion(this.startLine, this.endLineExclusive,
-      [this.start, this.end]);
+      {this.start, this.end, this.indentation = ''});
 
   @override
   int get hashCode => Object.hash(startLine, endLineExclusive);
@@ -58,7 +66,8 @@ class ContinousRegion {
     return identical(this, other) ||
         other is ContinousRegion &&
             other.startLine == startLine &&
-            other.endLineExclusive == endLineExclusive;
+            other.endLineExclusive == endLineExclusive &&
+            other.indentation == indentation;
   }
 }
 
@@ -67,8 +76,10 @@ class _PendingRegion {
   final int startLine;
 
   final Directive? start;
+  String indentation;
 
-  _PendingRegion(this.excerpt, this.startLine, this.start);
+  _PendingRegion(this.excerpt, this.startLine, this.start)
+      : indentation = start?.indentation ?? '';
 }
 
 class Excerpter {
@@ -136,8 +147,17 @@ class Excerpter {
         if (open.startLine <= _lineIdx) {
           _closePending(open, allowEmpty: true);
           _openExcerpts.remove(open);
-          _openExcerpts
-              .add(_PendingRegion(open.excerpt, _lineIdx + 1, open.start));
+          _openExcerpts.add(
+              _PendingRegion(open.excerpt, _lineIdx + 1, open.start)
+                ..indentation = open.indentation);
+        }
+      }
+    } else if (_line.isNotEmpty) {
+      // Check if open regions have their whitespace indendation across all
+      // active lines.
+      for (final open in _openExcerpts) {
+        if (!_line.startsWith(open.indentation)) {
+          open.indentation = '';
         }
       }
     }
@@ -151,7 +171,7 @@ class Excerpter {
 
     if (regionNames.isEmpty) regionNames.add(_defaultRegionKey);
     for (final name in regionNames) {
-      final isNew = _excerptStart(name);
+      final isNew = _excerptStart(name, directive);
       if (!isNew) {
         regionAlreadyStarted.add(_quoteName(name));
       }
@@ -222,7 +242,8 @@ class Excerpter {
       return;
     }
 
-    excerpt.regions.add(ContinousRegion(pending.startLine, _lineIdx));
+    excerpt.regions.add(ContinousRegion(pending.startLine, _lineIdx,
+        indentation: pending.indentation));
   }
 
   /// Registers [name] as an open excerpt.

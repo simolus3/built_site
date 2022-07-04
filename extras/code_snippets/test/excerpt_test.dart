@@ -89,6 +89,33 @@ myRequiredQuery(REQUIRED :variable AS TEXT OR NULL): SELECT :variable;
       Excerpt('q3', [ContinousRegion(7, 8)]),
     ]);
   });
+
+  test('finds common indentation', () {
+    const source = '''
+class MyClass {
+  // #docregion method
+  void myFunction() {
+    doSomethingCool();
+  }
+  // #enddocregion method
+}
+''';
+
+    _expectNoLogs();
+    final excerpter = Excerpter('test', source)..weave();
+    final excerpts = excerpter.excerpts.values;
+
+    expect(excerpts, [
+      Excerpt('(full)', [
+        ContinousRegion(0, 1),
+        ContinousRegion(2, 5),
+        ContinousRegion(6, 7),
+      ]),
+      Excerpt('method', [
+        ContinousRegion(2, 5, indentation: '  '),
+      ]),
+    ]);
+  });
 }
 
 void testSingle(String source, int startLine, int endLine) {
