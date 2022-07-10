@@ -69,8 +69,16 @@ class HighlightRenderer {
     }
 
     void region(HighlightRegion region, [FileSpan? span, int stripIndent = 0]) {
+      final docsUri = region.documentationUri;
+
       buffer.write('<span class="${region.type.cssClass}">');
+      if (docsUri != null) {
+        buffer.write('<a href="$docsUri">');
+      }
       text(span ?? region.source, stripIndent);
+      if (docsUri != null) {
+        buffer.write('</a>');
+      }
       buffer.write('</span>');
     }
 

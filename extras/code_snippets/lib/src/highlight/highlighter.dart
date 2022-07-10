@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:source_span/source_span.dart';
 
 import 'regions.dart';
@@ -8,7 +10,7 @@ abstract class Highlighter {
 
   Highlighter(this.file);
 
-  void highlight();
+  FutureOr<void> highlight();
 
   void report(HighlightRegion region) {
     foundRegions.add(region);

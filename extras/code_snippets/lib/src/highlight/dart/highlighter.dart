@@ -5,19 +5,38 @@ import 'package:analyzer/dart/ast/syntactic_entity.dart';
 import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/element.dart';
+import 'package:build/build.dart';
 import 'package:source_span/source_span.dart';
 
 import '../highlighter.dart';
 import '../regions.dart';
+import 'dart_index.dart';
+import 'dartdoc.dart';
+
+class _PendingUriResolve {
+  final Element element;
+  final HighlightRegion region;
+
+  _PendingUriResolve(this.element, this.region);
+}
 
 class DartHighlighter extends Highlighter {
   final CompilationUnit compilationUnit;
+  final BuildStep buildStep;
 
-  DartHighlighter(SourceFile file, this.compilationUnit) : super(file);
+  final List<_PendingUriResolve> _pendingResolves = [];
+
+  final Map<String, Uri> overridenDartdocUrls;
+
+  DartHighlighter(SourceFile file, this.buildStep, this.compilationUnit,
+      this.overridenDartdocUrls)
+      : super(file);
 
   @override
-  void highlight() {
+  Future<void> highlight() async {
+    _pendingResolves.clear();
     compilationUnit.visitChildren(_HighlightingVisitor(this));
+    await _resolveReferences();
 
     // Add comment ranges
     Token? token = compilationUnit.beginToken;
@@ -35,6 +54,30 @@ class DartHighlighter extends Highlighter {
       }
       token = token.next;
     }
+  }
+
+  Future<void> _resolveReferences() async {
+    final index = await DartIndex.of(buildStep);
+
+    for (final reference in _pendingResolves) {
+      final import =
+          await index.findImportForElement(reference.element, buildStep);
+
+      if (import != null) {
+        reference.region.documentationUri =
+            _dartDocUri(import, reference.element);
+      }
+    }
+
+    _pendingResolves.clear();
+  }
+
+  Uri _dartDocUri(AssetId import, Element element) {
+    final libraryName = import.path;
+    final base = overridenDartdocUrls[import.package] ??
+        defaultDocumentationUri(import.package);
+
+    return documentationForElement(element, libraryName, base);
   }
 }
 
@@ -154,7 +197,11 @@ class _HighlightingVisitor extends RecursiveAstVisitor<void> {
   void visitConstructorReference(ConstructorReference node) {
     final name = node.constructorName;
     name.type.accept(this);
-    _leaf(name.name, RegionType.invokedFunctionTitle);
+    final nameLeaf = _leaf(name.name, RegionType.invokedFunctionTitle);
+    final reference = node.constructorName.staticElement;
+    if (reference != null && nameLeaf != null) {
+      highlighter._pendingResolves.add(_PendingUriResolve(reference, nameLeaf));
+    }
   }
 
   @override
@@ -196,6 +243,7 @@ class _HighlightingVisitor extends RecursiveAstVisitor<void> {
 
   @override
   void visitEnumDeclaration(EnumDeclaration node) {
+    _keyword(node.enumKeyword);
     _visitChildrenWithTitle(node, node.name);
   }
 
@@ -370,11 +418,15 @@ class _HighlightingVisitor extends RecursiveAstVisitor<void> {
         : node.realTarget == null &&
             _startsWithUppercase.hasMatch(node.methodName.name);
 
-    _leaf(
+    final name = _leaf(
         node.methodName,
         isConstructor
             ? RegionType.classTitle
             : RegionType.invokedFunctionTitle);
+    if (name != null && calledFunction != null) {
+      highlighter._pendingResolves
+          .add(_PendingUriResolve(calledFunction, name));
+    }
 
     for (final child in node.childNodes) {
       if (child != node.methodName) child.accept(this);
@@ -385,7 +437,13 @@ class _HighlightingVisitor extends RecursiveAstVisitor<void> {
   void visitNamedType(NamedType node) {
     final name = node.name.name;
     final probablyBuiltIn = !_startsWithUppercase.hasMatch(name);
-    _leaf(node.name, probablyBuiltIn ? RegionType.builtIn : RegionType.type);
+    final nameLeaf = _leaf(
+        node.name, probablyBuiltIn ? RegionType.builtIn : RegionType.type);
+
+    final resolved = node.name.staticElement;
+    if (resolved != null && nameLeaf != null) {
+      highlighter._pendingResolves.add(_PendingUriResolve(resolved, nameLeaf));
+    }
 
     for (final child in node.childNodes) {
       if (child != node.name) child.accept(this);
@@ -439,27 +497,32 @@ class _HighlightingVisitor extends RecursiveAstVisitor<void> {
 
   @override
   void visitSimpleIdentifier(SimpleIdentifier node) {
-    if (node.parent is Annotation) {
-      _leaf(node, RegionType.meta);
-    } else {
-      final target = node.staticElement;
+    final target = node.staticElement;
+    HighlightRegion? region;
 
+    if (node.parent is Annotation) {
+      region = _leaf(node, RegionType.meta);
+    } else {
       if (target is VariableElement || target is PropertyAccessorElement) {
-        _leaf(node, RegionType.variable);
+        region = _leaf(node, RegionType.variable);
       } else if (target is FunctionTypedElement) {
-        _leaf(node, RegionType.functionTitle);
+        region = _leaf(node, RegionType.functionTitle);
       } else if (target is ClassElement) {
-        _leaf(node, RegionType.classTitle);
+        region = _leaf(node, RegionType.classTitle);
       } else if (node.parent is MethodDeclaration ||
           node.parent is FunctionDeclaration) {
-        _leaf(node, RegionType.functionTitle);
+        region = _leaf(node, RegionType.functionTitle);
       }
       // Unknown reference, attempt to guess from name
       else if (!_startsWithUppercase.hasMatch(node.name)) {
-        _leaf(node, RegionType.variable);
+        region = _leaf(node, RegionType.variable);
       } else {
-        _leaf(node, RegionType.type);
+        region = _leaf(node, RegionType.type);
       }
+    }
+
+    if (region != null && target != null) {
+      highlighter._pendingResolves.add(_PendingUriResolve(target, region));
     }
   }
 
@@ -557,11 +620,15 @@ class _HighlightingVisitor extends RecursiveAstVisitor<void> {
     _leaf(entity, RegionType.keyword);
   }
 
-  void _leaf(SyntacticEntity? entity, RegionType type) {
+  HighlightRegion? _leaf(SyntacticEntity? entity, RegionType type) {
+    HighlightRegion? region;
     if (entity != null) {
-      highlighter.report(HighlightRegion(
-          type, highlighter.file.span(entity.offset, entity.end)));
+      region = HighlightRegion(
+          type, highlighter.file.span(entity.offset, entity.end));
+      highlighter.report(region);
     }
+
+    return region;
   }
 
   void _punctuation(SyntacticEntity? entity) {

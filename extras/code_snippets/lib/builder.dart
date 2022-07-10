@@ -8,7 +8,7 @@ import 'package:source_span/source_span.dart';
 
 import 'src/excerpts/excerpt.dart';
 import 'src/highlight/highlighter.dart';
-import 'src/highlight/languages/dart.dart';
+import 'src/highlight/dart/highlighter.dart';
 import 'src/highlight/render.dart';
 
 export 'src/excerpts/excerpt.dart';
@@ -44,7 +44,10 @@ class CodeExcerptBuilder implements Builder {
   /// ```
   final bool dropIndendation;
 
-  CodeExcerptBuilder({this.dropIndendation = false});
+  final Map<String, Uri> overriddenDartDocUrls;
+
+  CodeExcerptBuilder(
+      {this.dropIndendation = false, this.overriddenDartDocUrls = const {}});
 
   bool shouldEmitFor(AssetId input, Excerpter excerpts) {
     return excerpts.containsDirectives;
@@ -66,7 +69,7 @@ class CodeExcerptBuilder implements Builder {
           unit = await buildStep.resolver.compilationUnitFor(assetId);
         }
 
-        return DartHighlighter(source, unit);
+        return DartHighlighter(source, buildStep, unit, overriddenDartDocUrls);
     }
 
     return null;
@@ -94,7 +97,7 @@ class CodeExcerptBuilder implements Builder {
 
       final highlighter = await highlighterFor(assetId, content, buildStep) ??
           NullHighlighter(source);
-      highlighter.highlight();
+      await highlighter.highlight();
 
       final results = <String, Object?>{};
       final writePlaster = writePlasterFor(assetId);

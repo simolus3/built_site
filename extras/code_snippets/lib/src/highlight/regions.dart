@@ -4,12 +4,14 @@ class HighlightRegion {
   final RegionType type;
   final FileSpan source;
 
-  final Uri? viewableDefinition;
+  Uri? viewableDefinition;
+  Uri? documentationUri;
 
   HighlightRegion(
     this.type,
     this.source, {
     this.viewableDefinition,
+    this.documentationUri,
   });
 }
 
