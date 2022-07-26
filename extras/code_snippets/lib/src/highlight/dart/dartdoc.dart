@@ -1,4 +1,5 @@
 import 'package:analyzer/dart/element/element.dart';
+import 'package:collection/collection.dart';
 import 'package:path/path.dart';
 
 // https://github.com/dart-lang/dartdoc/blob/f39f5e2880d6513bf47ef7a749e0dd672de33c04/lib/src/comment_references/parser.dart#L10
@@ -48,7 +49,9 @@ Uri documentationForElement(
     if (element is LibraryElement) {
       reversePath.add('$publicLibrary-library.html');
     } else if (element is ClassElement) {
-      reversePath.add('${element.name}-class.html');
+      final suffix = element.isEnum ? '' : '-class';
+
+      reversePath.add('${element.name}$suffix.html');
     } else if (element is ExtensionElement) {
       reversePath.add('${element.name}.html');
     } else if (element is TypeAliasElement) {
@@ -71,14 +74,18 @@ Uri documentationForElement(
     } else if (element is FieldElement || element is PropertyAccessorElement) {
       var name = '${element.name}';
 
-      if (element is FieldElement) {
-        if (element.isEnumConstant) {
+      final field = element is FieldElement
+          ? element
+          : (element as PropertyAccessorElement).variable;
+
+      if (field is FieldElement) {
+        if (field.isEnumConstant) {
           // Enum constants don't get their own dartdoc page, link to enum
-          buildPathAsParent(element.enclosingElement);
+          buildPathAsParent(field.enclosingElement);
           return;
         }
 
-        if (element.isConst) {
+        if (field.isConst) {
           name += '-constant';
         }
       }
