@@ -1,5 +1,4 @@
 import 'package:analyzer/dart/element/element.dart';
-import 'package:collection/collection.dart';
 import 'package:path/path.dart';
 
 // https://github.com/dart-lang/dartdoc/blob/f39f5e2880d6513bf47ef7a749e0dd672de33c04/lib/src/comment_references/parser.dart#L10

@@ -1,3 +1,7 @@
+## 0.2.10
+
+- Upgrade to the latest `markdown` and `analyzer` packages.
+
 ## 0.2.9
 
 - Fix a bug in the liquid lexer causing `{` to not be recognized in some cases.

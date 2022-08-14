@@ -123,13 +123,11 @@ class _HighlightingVisitor extends RecursiveAstVisitor<void> {
     }
   }
 
-  void _visitChildrenWithTitle(AstNode node, AstNode? title) {
+  void _visitChildrenWithTitle(AstNode node, SyntacticEntity? title) {
+    _reportLeaf(title, 'title');
+
     for (final child in node.childNodes) {
-      if (child == title) {
-        _reportLeaf(child, 'title');
-      } else {
-        child.accept(this);
-      }
+      child.accept(this);
     }
   }
 
@@ -206,16 +204,16 @@ class _HighlightingVisitor extends RecursiveAstVisitor<void> {
   void visitClassDeclaration(ClassDeclaration node) {
     _keywordLeaf(node.classKeyword);
     _keywordLeaf(node.abstractKeyword);
-    _visitChildrenWithTitle(node, node.name);
+    _visitChildrenWithTitle(node, node.name2);
   }
 
   @override
   void visitConstructorDeclaration(ConstructorDeclaration node) {
-    _functionNameLeaf(node.name);
+    _functionNameLeaf(node.name2);
     _typeNameLeaf(node.returnType);
 
     for (final child in node.childNodes) {
-      if (child != node.name && child != node.returnType) {
+      if (child != node.returnType) {
         child.accept(this);
       }
     }
@@ -253,7 +251,7 @@ class _HighlightingVisitor extends RecursiveAstVisitor<void> {
 
   @override
   void visitExportDirective(ExportDirective node) {
-    _keywordLeaf(node.keyword);
+    _keywordLeaf(node.exportKeyword);
     super.visitExportDirective(node);
   }
 
@@ -274,7 +272,7 @@ class _HighlightingVisitor extends RecursiveAstVisitor<void> {
     _keywordLeaf(node.extensionKeyword);
     _keywordLeaf(node.onKeyword);
 
-    _visitChildrenWithTitle(node, node.name);
+    _visitChildrenWithTitle(node, node.name2);
   }
 
   @override
@@ -356,7 +354,7 @@ class _HighlightingVisitor extends RecursiveAstVisitor<void> {
 
   @override
   void visitImportDirective(ImportDirective node) {
-    _keywordLeaf(node.keyword);
+    _keywordLeaf(node.importKeyword);
     _keywordLeaf(node.deferredKeyword);
     _keywordLeaf(node.asKeyword);
     super.visitImportDirective(node);
@@ -386,7 +384,7 @@ class _HighlightingVisitor extends RecursiveAstVisitor<void> {
 
   @override
   void visitLibraryDirective(LibraryDirective node) {
-    _keywordLeaf(node.keyword);
+    _keywordLeaf(node.libraryKeyword);
     super.visitLibraryDirective(node);
   }
 
