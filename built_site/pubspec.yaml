@@ -1,13 +1,13 @@
 name: built_site
 description: Build static websites using Dart's build system
-version: 0.2.10
+version: 0.2.11
 # homepage: https://www.example.com
 
 environment:
   sdk: '>=2.12.0-0 <3.0.0'
 
 dependencies:
-  analyzer: '^4.6.0'
+  analyzer: '^5.0.0'
   build: ^2.0.0
   charcode: ^1.2.0
   checked_yaml: ^2.0.1

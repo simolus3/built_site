@@ -1,3 +1,7 @@
+## 0.2.11
+
+- Support analyzer 5.x
+
 ## 0.2.10
 
 - Upgrade to the latest `markdown` and `analyzer` packages.
