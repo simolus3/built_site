@@ -48,28 +48,28 @@ Uri documentationForElement(
     if (element is LibraryElement) {
       reversePath.add('$publicLibrary-library.html');
     } else if (element is ClassElement) {
-      final suffix = element.isEnum ? '' : '-class';
-
-      reversePath.add('${element.name}$suffix.html');
+      reversePath.add('${element.name}-class.html');
+    } else if (element is EnumElement) {
+      reversePath.add('${element.name}.html');
     } else if (element is ExtensionElement) {
       reversePath.add('${element.name}.html');
     } else if (element is TypeAliasElement) {
       reversePath.add('${element.name}.html');
     } else if (element is ConstructorElement) {
-      var constructorName = element.enclosingElement.name;
+      var constructorName = element.enclosingElement3.name;
       if (element.name.isNotEmpty) {
         constructorName += '.${element.name}';
       }
 
       reversePath.add('$constructorName.html');
-      buildPathAsParent(element.enclosingElement);
+      buildPathAsParent(element.enclosingElement3);
     } else if (element is MethodElement) {
       var name = element.isOperator
           ? 'operator_${_operatorNames[element.name]}'
           : element.name;
 
       reversePath.add('$name.html');
-      buildPathAsParent(element.enclosingElement);
+      buildPathAsParent(element.enclosingElement3);
     } else if (element is FieldElement || element is PropertyAccessorElement) {
       var name = '${element.name}';
 
@@ -80,7 +80,7 @@ Uri documentationForElement(
       if (field is FieldElement) {
         if (field.isEnumConstant) {
           // Enum constants don't get their own dartdoc page, link to enum
-          buildPathAsParent(field.enclosingElement);
+          buildPathAsParent(field.enclosingElement3);
           return;
         }
 
@@ -90,9 +90,9 @@ Uri documentationForElement(
       }
 
       reversePath.add('$name.html');
-      buildPathAsParent(element.enclosingElement!);
+      buildPathAsParent(element.enclosingElement3!);
     } else {
-      final parent = element.enclosingElement;
+      final parent = element.enclosingElement3;
       if (parent != null) {
         buildPath(parent);
       }

@@ -64,7 +64,7 @@ class DartIndex {
       Element element, BuildStep buildStep) async {
     // First, find a top-level ancestor of the element
     final topLevelAncestor = element.thisOrAncestorMatchingNullable(
-        (el) => el.enclosingElement is CompilationUnitElement);
+        (el) => el.enclosingElement3 is CompilationUnitElement);
 
     if (topLevelAncestor == null) return null;
 
@@ -110,7 +110,7 @@ extension on Element {
   ) {
     Element? element = this;
     while (element != null && !predicate(element)) {
-      element = element.enclosingElement;
+      element = element.enclosingElement3;
     }
     return element as E?;
   }

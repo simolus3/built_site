@@ -157,7 +157,9 @@ class _HighlightingVisitor extends RecursiveAstVisitor<void> {
   void visitClassDeclaration(ClassDeclaration node) {
     _keyword(node.classKeyword);
     _keyword(node.abstractKeyword);
-    _visitChildrenWithTitle(node, node.name, RegionType.classTitle);
+
+    _leaf(node.name, RegionType.classTitle);
+    super.visitClassDeclaration(node);
   }
 
   @override
@@ -187,7 +189,7 @@ class _HighlightingVisitor extends RecursiveAstVisitor<void> {
     _leaf(node.returnType, RegionType.classTitle);
 
     for (final child in node.childNodes) {
-      if (child != node.name && child != node.returnType) {
+      if (child != node.returnType) {
         child.accept(this);
       }
     }
@@ -214,7 +216,7 @@ class _HighlightingVisitor extends RecursiveAstVisitor<void> {
   void visitDeclaredIdentifier(DeclaredIdentifier node) {
     node.metadata.accept(this);
     _keyword(node.keyword);
-    _leaf(node.identifier,
+    _leaf(node.name,
         node.isConst ? RegionType.constantVariable : RegionType.variable);
   }
 
@@ -244,12 +246,13 @@ class _HighlightingVisitor extends RecursiveAstVisitor<void> {
   @override
   void visitEnumDeclaration(EnumDeclaration node) {
     _keyword(node.enumKeyword);
-    _visitChildrenWithTitle(node, node.name);
+    _leaf(node.name, RegionType.title);
+    super.visitEnumDeclaration(node);
   }
 
   @override
   void visitExportDirective(ExportDirective node) {
-    _keyword(node.keyword);
+    _keyword(node.exportKeyword);
     super.visitExportDirective(node);
   }
 
@@ -269,7 +272,9 @@ class _HighlightingVisitor extends RecursiveAstVisitor<void> {
   void visitExtensionDeclaration(ExtensionDeclaration node) {
     _keyword(node.extensionKeyword);
     _keyword(node.onKeyword);
-    _visitChildrenWithTitle(node, node.name, RegionType.classTitle);
+
+    _leaf(node.name, RegionType.classTitle);
+    super.visitExtensionDeclaration(node);
   }
 
   @override
@@ -351,7 +356,7 @@ class _HighlightingVisitor extends RecursiveAstVisitor<void> {
 
   @override
   void visitImportDirective(ImportDirective node) {
-    _keyword(node.keyword);
+    _keyword(node.importKeyword);
     _keyword(node.deferredKeyword);
     _keyword(node.asKeyword);
     super.visitImportDirective(node);
@@ -388,7 +393,7 @@ class _HighlightingVisitor extends RecursiveAstVisitor<void> {
 
   @override
   void visitLibraryDirective(LibraryDirective node) {
-    _keyword(node.keyword);
+    _keyword(node.libraryKeyword);
     super.visitLibraryDirective(node);
   }
 
@@ -406,7 +411,8 @@ class _HighlightingVisitor extends RecursiveAstVisitor<void> {
     _keyword(node.propertyKeyword);
     _keyword(node.operatorKeyword);
 
-    _visitChildrenWithTitle(node, node.name, RegionType.functionTitle);
+    _leaf(node.name, RegionType.functionTitle);
+    super.visitMethodDeclaration(node);
   }
 
   @override
@@ -655,17 +661,6 @@ class _HighlightingVisitor extends RecursiveAstVisitor<void> {
 
   void _symbol(SyntacticEntity? entity) {
     _leaf(entity, RegionType.symbol);
-  }
-
-  void _visitChildrenWithTitle(AstNode node, AstNode? title,
-      [RegionType titleType = RegionType.title]) {
-    for (final child in node.childNodes) {
-      if (child == title) {
-        _leaf(child, titleType);
-      } else {
-        child.accept(this);
-      }
-    }
   }
 }
 
