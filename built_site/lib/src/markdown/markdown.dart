@@ -6,30 +6,30 @@ export 'toc.dart';
 
 const embeddRawHtml = 'built_site_begin_raw_html';
 
-final _document = md.Document(
-  blockSyntaxes: const [
-    _HighlightingFencedCodeBlockSyntax(),
-    _HeaderWithCustomIdSyntax(),
-    md.SetextHeaderSyntax(),
-    md.TableSyntax(),
-    _EmbeddRawHtmlSyntax(),
-  ],
-  inlineSyntaxes: [
-    md.InlineHtmlSyntax(),
-    md.StrikethroughSyntax(),
-    md.EmojiSyntax(),
-    md.AutolinkExtensionSyntax(),
-  ],
-);
-
 List<md.Node> parse(String content, {bool inline = false}) {
+  final document = md.Document(
+    blockSyntaxes: const [
+      _HighlightingFencedCodeBlockSyntax(),
+      _HeaderWithCustomIdSyntax(),
+      md.SetextHeaderSyntax(),
+      md.TableSyntax(),
+      _EmbeddRawHtmlSyntax(),
+    ],
+    inlineSyntaxes: [
+      md.InlineHtmlSyntax(),
+      md.StrikethroughSyntax(),
+      md.EmojiSyntax(),
+      md.AutolinkExtensionSyntax(),
+    ],
+  );
+
   List<md.Node> nodes;
   if (inline) {
-    nodes = _document.parseInline(content);
+    nodes = document.parseInline(content);
   } else {
     // Replace windows line endings with unix line endings, and split.
     final lines = content.replaceAll('\r\n', '\n').split('\n');
-    nodes = _document.parseLines(lines);
+    nodes = document.parseLines(lines);
   }
 
   return nodes;

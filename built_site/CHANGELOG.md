@@ -1,3 +1,7 @@
+## 0.2.12
+
+- Fix markdown link references not being scoped to documents as they should be.
+
 ## 0.2.11
 
 - Support analyzer 5.x
