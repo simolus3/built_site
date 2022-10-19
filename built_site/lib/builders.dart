@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:build/build.dart';
-import 'package:sass/sass.dart' as sass;
 import 'package:yaml/yaml.dart';
 
 import 'src/builders/copy_to_web.dart';
@@ -9,7 +8,6 @@ import 'src/builders/generator.dart';
 import 'src/builders/hash.dart';
 import 'src/builders/indexer.dart';
 import 'src/builders/metadata.dart';
-import 'src/builders/sass.dart';
 import 'src/builders/theme_content.dart';
 import 'src/config.dart';
 
@@ -35,32 +33,12 @@ Builder localThemeIndex(BuilderOptions options) => const LocalThemeIndexer();
 
 Builder indexThemes(BuilderOptions options) => const ThemeIndexer();
 
-Builder sassBuilder(BuilderOptions options) {
-  final outputStyleString = options.config['output_style'] as String?;
-  const styles = {
-    'expanded': sass.OutputStyle.expanded,
-    'compressed': sass.OutputStyle.compressed,
-  };
-  final style = styles[outputStyleString] ?? sass.OutputStyle.expanded;
-  final sourceMapsRequested = options.config['source_maps'] as bool? ?? false;
-
-  return SassBuilder(
-    output: style,
-    writeSourceMaps: sourceMapsRequested && options.isRoot,
-  );
-}
-
 PostProcessBuilder postProcess(BuilderOptions options) {
   return CopyToWeb();
 }
 
 PostProcessBuilder extractStatic(BuilderOptions options) {
   return const ExtractStatic();
-}
-
-PostProcessBuilder deleteSources(BuilderOptions options) {
-  return FileDeletingBuilder(const ['.sass', '.scss'],
-      isEnabled: options.config['enabled'] == true);
 }
 
 class _ExtractThemes implements Builder {

@@ -126,27 +126,12 @@ builders:
     builder_factories: ["generator"]
     build_extensions: {'.page_meta': ['.generated_page']}
     import: "package:built_site/builders.dart"
-    applies_builders: ['|copy_to_web']
+    applies_builders: ['|copy_to_web', 'sass_builder']
     defaults:
       dev_options:
         environment: "dev"
       release_options:
         environment: "prod"
-
-  # Independent builder transforming sass/scss files to css
-  sass_builder:
-    import: "package:built_site/builders.dart"
-    builder_factories: ["sassBuilder"]
-    auto_apply: dependents
-    build_extensions:
-      .scss: [".css", ".css.map"]
-      .sass: [".css", ".css.map"]
-    applies_builders: ["|delete_sources"]
-    defaults:
-      dev_options:
-        source_maps: true
-      release_options:
-        outputStyle: compressed
 
 post_process_builders:
   # Regular builders must output files relative to their primary input, which
@@ -161,17 +146,6 @@ post_process_builders:
     builder_factory: "extractStatic"
     import: "package:built_site/builders.dart"
     input_extensions: ["static_content.tar"]
-
-  # Applied by other builders: Deletes sources that shouldn't appear in the output
-  delete_sources:
-    builder_factory: "deleteSources"
-    import: "package:built_site/builders.dart"
-    input_extensions: [".sass", ".scss"]
-    defaults:
-      options:
-        enabled: false
-      release_options:
-        enabled: true
 
 targets:
   $default:
