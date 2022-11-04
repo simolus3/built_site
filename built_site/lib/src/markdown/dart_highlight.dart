@@ -204,12 +204,12 @@ class _HighlightingVisitor extends RecursiveAstVisitor<void> {
   void visitClassDeclaration(ClassDeclaration node) {
     _keywordLeaf(node.classKeyword);
     _keywordLeaf(node.abstractKeyword);
-    _visitChildrenWithTitle(node, node.name2);
+    _visitChildrenWithTitle(node, node.name);
   }
 
   @override
   void visitConstructorDeclaration(ConstructorDeclaration node) {
-    _functionNameLeaf(node.name2);
+    _functionNameLeaf(node.name);
     _typeNameLeaf(node.returnType);
 
     for (final child in node.childNodes) {
@@ -272,7 +272,7 @@ class _HighlightingVisitor extends RecursiveAstVisitor<void> {
     _keywordLeaf(node.extensionKeyword);
     _keywordLeaf(node.onKeyword);
 
-    _visitChildrenWithTitle(node, node.name2);
+    _visitChildrenWithTitle(node, node.name);
   }
 
   @override

@@ -67,7 +67,7 @@ Object? _merge(Object? parent, Object? override) {
     final keys = parent.keys.cast<Object?>().followedBy(override.keys).toSet();
 
     return <String, Object?>{
-      for (final key in keys) "$key": _merge(parent[key], override[key]),
+      for (final key in keys) '$key': _merge(parent[key], override[key]),
     };
   }
 

@@ -4,15 +4,15 @@ version: 0.2.12
 # homepage: https://www.example.com
 
 environment:
-  sdk: '>=2.12.0-0 <3.0.0'
+  sdk: '>=2.17.0 <3.0.0'
 
 dependencies:
-  analyzer: '^5.0.0'
+  analyzer: ^5.2.0
   build: ^2.0.0
   charcode: ^1.2.0
   checked_yaml: ^2.0.1
   crypto: ^3.0.0
-  glob: '^2.0.0'
+  glob: ^2.0.0
   highlight: ^0.7.0
   html: ^0.15.0
   intl: ^0.17.0
