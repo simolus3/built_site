@@ -55,6 +55,8 @@ Uri documentationForElement(
       reversePath.add('${element.name}.html');
     } else if (element is TypeAliasElement) {
       reversePath.add('${element.name}.html');
+    } else if (element is FunctionElement) {
+      reversePath.add('${element.name}.html');
     } else if (element is ConstructorElement) {
       var constructorName = element.enclosingElement3.name;
       if (element.name.isNotEmpty) {
