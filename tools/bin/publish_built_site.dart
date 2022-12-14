@@ -10,7 +10,6 @@ Future<void> main() async {
       yield* dir.childDirectory('templates').list(recursive: true);
 
       yield dir.childFile('build.yaml');
-      yield dir.childFile('NOTICE');
     },
   );
 

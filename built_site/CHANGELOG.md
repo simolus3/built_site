@@ -1,3 +1,10 @@
+## 0.2.13
+
+- Fix parsing `offset` parameters in for loops.
+- Add `emit_content_file` builder option. When enabled, the rendered markdown of a page
+  will be emitted before the page's template is applied into a `.page_content` file.
+- Add the `changeExtension` filter.
+
 ## 0.2.12
 
 - Fix markdown link references not being scoped to documents as they should be.

@@ -260,6 +260,7 @@ class Parser {
         _expect(TokenType.colon);
         limit = _parseExpression();
       } else if (token.lexeme == 'offset') {
+        _expect(TokenType.colon);
         offset = _parseExpression();
       } else if (token.lexeme == 'reversed') {
         hasReversed = true;

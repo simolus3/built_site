@@ -21,12 +21,18 @@ class SiteGenerator extends Builder {
   final String environment;
   final BuilderOptions options;
 
-  SiteGenerator(this.environment, this.options);
+  /// Whether, in addition to emitting the generated HTML page, another file
+  /// with the HTML snippet of the page's content (but not embedded in the
+  /// page's template) should be emitted.
+  final bool emitContentFile;
+
+  SiteGenerator(this.environment, this.options)
+      : emitContentFile = options.config['emit_content_file'] == true;
 
   @override
   Map<String, List<String>> get buildExtensions {
     return const {
-      '.page_meta': ['.generated_page']
+      '.page_meta': ['.generated_page', '.page_content']
     };
   }
 
@@ -270,6 +276,11 @@ class SiteGenerator extends Builder {
       final nodes = md.parse(pageContent);
       pageContent = md.renderToHtml(nodes);
       contents = md.TableOfContents.readFrom(nodes);
+    }
+
+    if (emitContentFile) {
+      final contentId = metaId.changeExtension('.page_content');
+      await buildStep.writeAsString(contentId, pageContent);
     }
 
     String generated;

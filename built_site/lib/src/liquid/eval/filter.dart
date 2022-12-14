@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:math';
 
 import 'package:intl/intl.dart';
+import 'package:path/path.dart' as p;
 
 import '../../markdown/markdown.dart' as md;
 import 'utils.dart';
@@ -197,6 +198,10 @@ Map<String, Filter> filters = {
   'ast_most': atMost,
   'capitalize': capitalize,
   'ceil': ceil,
+  'changeExtension': (input, args) {
+    final without = p.url.withoutExtension(input.toString());
+    return without + args.map((e) => e.toString()).join();
+  },
   'compact': compact,
   'concat': concat,
   'date': date,
