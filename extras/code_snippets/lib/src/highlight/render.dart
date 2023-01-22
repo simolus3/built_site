@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:math';
 
 import 'package:build/build.dart';
@@ -6,6 +7,11 @@ import 'package:source_span/source_span.dart';
 
 import '../excerpts/excerpt.dart';
 import 'highlighter.dart';
+
+String _escape(String source) {
+  const escaper = HtmlEscape();
+  return escaper.convert(source);
+}
 
 class HighlightRenderer {
   final Highlighter highlighter;
@@ -41,17 +47,17 @@ class HighlightRenderer {
 
     void text(FileSpan span, [int stripIndent = 0]) {
       if (stripIndent == 0) {
-        buffer.write(span.text);
+        buffer.write(_escape(span.text));
       } else {
         // Go through the span line by line. If it starts at the beginning of a
         // line, drop the first [stripIndent] units.
         final file = span.file;
 
         // First line, cut of `start column - stripIndent` chars at the start
-        buffer.write(file.getText(
+        buffer.write(_escape(file.getText(
           span.start.offset + max(0, stripIndent - span.start.column),
           min(file.getOffset(span.start.line + 1) - 1, span.end.offset),
-        ));
+        )));
 
         for (var line = span.start.line + 1; line <= span.end.line; line++) {
           buffer.writeln();
@@ -62,7 +68,7 @@ class HighlightRenderer {
           if (start < endOffset) {
             // If the span spans multiple lines and this isn't the first one, we
             // can just cut of the first chars.
-            buffer.write(file.getText(start, endOffset));
+            buffer.write(_escape(file.getText(start, endOffset)));
           }
         }
       }
