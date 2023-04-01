@@ -29,8 +29,11 @@ class DartIndexBuilder implements Builder {
     final output = buildStep.allowedOutputs.single;
 
     final exportedByPackage = <String, List<ElementIdentifier>>{};
+    final src = Glob('lib/src/**');
 
-    await for (final input in buildStep.findAssets(Glob('lib/*.dart'))) {
+    await for (final input in buildStep.findAssets(Glob('lib/**.dart'))) {
+      if (src.matches(input.path)) continue;
+
       final library = await buildStep.resolver.libraryFor(input);
       if (library.name.isEmpty) continue;
 
