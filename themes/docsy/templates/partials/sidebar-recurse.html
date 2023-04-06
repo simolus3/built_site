@@ -29,7 +29,9 @@
 
             {% assign active = page.meta_id == child %}
             {% assign page_info = child | pageInfo %}
+            {% if page_info.data.hidden != true %}
             <a class="td-sidebar-link td-sidebar-link__page {% if active %} active{% endif %}" href="{{ page_info.path | relUrl }}">{{ page_info.data.title }}</a>
+            {% endif %}
             {% else %}
             {% include "partials/sidebar-recurse" section = child depth = depth %}
             {% endif %}
