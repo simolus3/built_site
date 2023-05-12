@@ -1,3 +1,8 @@
+## 0.2.15
+
+- Update dependencies
+- Fix build ordering of applied sass compiler
+
 ## 0.2.13
 
 - Fix parsing `offset` parameters in for loops.

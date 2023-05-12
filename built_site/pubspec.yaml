@@ -1,6 +1,6 @@
 name: built_site
 description: Build static websites using Dart's build system
-version: 0.2.13
+version: 0.2.15
 # homepage: https://www.example.com
 
 environment:
@@ -15,9 +15,9 @@ dependencies:
   glob: ^2.0.0
   highlight: ^0.7.0
   html: ^0.15.0
-  intl: ^0.17.0
+  intl: ^0.18.0
   json_annotation: ^4.0.1
-  markdown: ^6.0.0
+  markdown: ^7.0.0
   messagepack: ^0.2.1
   path: ^1.8.0
   sass_builder: ^2.2.1

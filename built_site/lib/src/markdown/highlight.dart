@@ -44,8 +44,7 @@ class _HighlightToMarkdown {
       _addChildNodes(node);
 
       final prefix = node.noPrefix ? '' : 'hljs-';
-      final element = md.Element.withTag('span');
-      element.children!.addAll(nodes);
+      final element = md.Element('span', [...nodes]);
       element.attributes['class'] = prefix + className;
 
       nodes = safedNodes..add(element);

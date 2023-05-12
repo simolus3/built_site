@@ -420,11 +420,10 @@ class _HighlightingVisitor extends RecursiveAstVisitor<void> {
 
   @override
   void visitNamedType(NamedType node) {
-    final name = node.name.name;
+    final name = node.name2.lexeme;
     final probablyBuiltIn = !_startsWithUppercase.hasMatch(name);
-    _reportLeaf(node.name, probablyBuiltIn ? 'built_in' : 'type');
-
-    _visitChildrenExcept(node, node.name);
+    _reportLeaf(node.name2, probablyBuiltIn ? 'built_in' : 'type');
+    node.typeArguments?.accept(this);
   }
 
   @override

@@ -1,4 +1,3 @@
-//@dart=2.9
 import 'package:built_site/src/markdown/markdown.dart';
 import 'package:test/test.dart';
 

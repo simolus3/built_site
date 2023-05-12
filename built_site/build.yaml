@@ -55,7 +55,7 @@ builders:
     build_to: cache
     import: "package:built_site/builders.dart"
     builder_factories: ["extractThemes"]
-    runs_before: ["|index_themes"]
+    runs_before: [":index_themes"]
 
   # Finds static resources contributed by a single theme package. Basically,
   # outputs the result of running `findAssets(Glob('{static/**,i18n/**}'))` in
@@ -67,7 +67,7 @@ builders:
     build_to: cache
     import: "package:built_site/builders.dart"
     builder_factories: ["localThemeIndex"]
-    runs_before: ['|index_themes']
+    runs_before: [':index_themes']
 
   # Collects all resources found by local_theme_indexer into a single tar file
   # for resources and into a single json for translation keys.
@@ -76,14 +76,14 @@ builders:
     build_to: cache
     import: "package:built_site/builders.dart"
     builder_factories: ["indexThemes"]
-    runs_before: ["|metadata"]
+    runs_before: [":metadata", "sass_builder"]
     build_extensions:
       "lib/built_site_themes.json":
         - "lib/static_content.tar"
         - "lib/i18n_merged.json"
         - "web/main.scss"
         - "web/main.dart"
-    applies_builders: ["|extract_static"]
+    applies_builders: [":extract_static"]
 
   # Metadata extractor to build indices and overviews
   metadata:
@@ -94,7 +94,7 @@ builders:
     build_to: cache
     import: "package:built_site/builders.dart"
     builder_factories: ["metadata"]
-    runs_before: ["|built_site", "|indexer"]
+    runs_before: [":built_site", ":indexer"]
     defaults:
       generate_for:
         - "pages/**"
@@ -106,7 +106,7 @@ builders:
     build_to: cache
     import: "package:built_site/builders.dart"
     builder_factories: ["index"]
-    runs_before: ["|built_site"]
+    runs_before: [":built_site"]
     is_optional: true
 
   # Lazily create a hash of assets when needed. This is used for the "asset"
@@ -117,7 +117,7 @@ builders:
     build_to: cache
     import: 'package:built_site/builders.dart'
     builder_factories: ["hash"]
-    runs_before: ["|built_site"]
+    runs_before: [":built_site"]
     is_optional: true
 
   # The default builder, generating a static website and its final paths.
@@ -126,7 +126,7 @@ builders:
     builder_factories: ["generator"]
     build_extensions: {'.page_meta': ['.generated_page']}
     import: "package:built_site/builders.dart"
-    applies_builders: ['|copy_to_web', 'sass_builder']
+    applies_builders: [':copy_to_web', 'sass_builder']
     defaults:
       dev_options:
         environment: "dev"
