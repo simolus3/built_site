@@ -23,7 +23,7 @@ class SassOnlyPackage extends Package {
           {
             'name': name,
             'version': version,
-            'environment': {'sdk': '>=2.0.0 <3.0.0'},
+            'environment': {'sdk': '>=2.12.0 <4.0.0'},
           },
         );
 

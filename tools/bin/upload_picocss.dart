@@ -3,7 +3,7 @@ import 'package:git/git.dart';
 import 'package:simons_pub_uploader/upload.dart';
 import 'package:tools/sass_package.dart';
 
-const _version = '1.5.6';
+const _version = '1.5.10';
 const _fs = LocalFileSystem();
 
 Future<void> main() async {
