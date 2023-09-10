@@ -1,3 +1,6 @@
 {% if site.gcs_engine_id or site.algolia_search %}
-<input type="search" class="form-control td-search-input" placeholder="&#xf002 {{ "ui_search" | i18n }}" aria-label="{{ "ui_search" | i18n }}" autocomplete="off">
+<div class="td-search">
+    <div class="td-search__icon"></div>
+    <input type="search" class="td-search__input form-control td-search-input" placeholder="{{ "ui_search" | i18n }}" aria-label="{{ "ui_search" | i18n }}" autocomplete="off">
+</div>
 {% endif %}

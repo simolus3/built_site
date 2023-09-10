@@ -3,26 +3,24 @@
 {% assign byline = args.byline | default: '' %}
 
 <section id="{{ block_id }}" class="row td-cover-block td-cover-block--height-{{ height }} js-td-cover td-overlay td-overlay--dark -bg-{{ args.color | default: 'dark' }}">
-  <div class="container td-overlay__inner">
-    <div class="row">
-      <div class="col-12">
-        <div class="text-center">
-            {% if args.title != nil %}
-                <h1 class="display-1 mt-0 mt-md-5 pb-4">{{ args.title }}</h1>
-            {% endif %}
-            {% if args.subtitle != nil %}
-                <p class="display-2 text-uppercase mb-0">{{ args.subtitle }}</p>
-            {% endif %}
-            <div class="pt-3 lead">
-            {{ inner }}
+  <div class="col-12">
+    <div class="container td-overlay__inner">
+      <div class="text-center">
+          {% if args.title != nil %}
+              <h1 class="display-1 mt-0 mt-md-5 pb-4">{{ args.title }}</h1>
+          {% endif %}
+          {% if args.subtitle != nil %}
+              <p class="display-2 text-uppercase mb-0">{{ args.subtitle }}</p>
+          {% endif %}
+          <div class="pt-3 lead">
+          {{ inner }}
           </div>
-        </div>
       </div>
     </div>
   </div>
   {% if byline != '' %}
   <div class="byline">
-    <small>{{ byline }}</small>
+    {{ byline }}
   </div>
   {% endif %}
 </section>

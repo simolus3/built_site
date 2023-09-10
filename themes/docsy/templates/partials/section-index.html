@@ -11,12 +11,11 @@
       {% endif %}
       {% assign page = child.index | default: child | pageInfo %}
       <div class="entry">
-        <h5>
-            <a href="{{ page.path | relUrl }}">{{ page.data.title }}</a>
-            {% if page.data.description %}
-              <p>{{ page.data.description | markdownify }}</p>
-            {% endif %}
-        </h5>
+        <h5><a href="{{ page.path | relUrl }}">{{ page.data.title }}</a></h5>
+
+        {% if page.data.description %}
+          {{ page.data.description | markdownify }}
+        {% endif %}
       </div>
     {% endfor %}
 </div>

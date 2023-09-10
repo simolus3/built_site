@@ -3,9 +3,9 @@
 <meta name="generator" content="built_site {{ built_site.version }}">
 
 {% if environment == "prod" %}
-<META NAME="ROBOTS" CONTENT="INDEX, FOLLOW">
+<meta name="robots" content="index, follow">
 {% else %}
-<META NAME="ROBOTS" CONTENT="NOINDEX, NOFOLLOW">
+<meta name="robots" content="noindex, nofollow">
 {% endif %}
 
 {% include "partials/favicons.html" %}

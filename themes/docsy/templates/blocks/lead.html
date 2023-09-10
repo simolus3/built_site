@@ -1,11 +1,13 @@
 {% assign col_id =  args.color | default: ordinal %}
 <!-- Height can be one of: auto, min, med, max, full -->
 {% assign height = args.height | default: "auto"  %}
-<a id="td-block-{{ ordinal }}" class="td-offset-anchor"></a>
-<section class="row td-box td-box--{{ col_id }} position-relative td-box--gradient td-box--height-{{ height }}">
-	<div class="container text-center td-arrow-down">
-		<span class="h4 mb-0">
-			{{ inner }}
-		</span>
+<div><a id="td-block-{{ ordinal }}" class="td-offset-anchor"></a></div>
+<section class="row td-box td-box--{{ col_id }} position-relative td-box--height-{{ height }}">
+	<div class="col-12">
+		<div class="container text-center td-arrow-down">
+			<span class="h4 mb-0">
+				{{ inner }}
+			</span>
+		</div>
 	</div>
 </section>

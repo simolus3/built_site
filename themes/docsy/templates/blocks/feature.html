@@ -5,7 +5,7 @@
     <i class="{{ icon }}"></i>
   </div>
   <h4 class="h3">{{ args.title | markdownify: 'inline' }}</h4>
-  <p class="mb-0">{{ inner }}</p>
+  <div class="mb-0">{{ inner }}</div>
   {% if args.url != nil %}
     <p><a href="{{ args.url }}">{{ url_text | default: "ui_read_more" | i18n }}</a></p>
   {% endif %}

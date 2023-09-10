@@ -441,18 +441,18 @@ class _HighlightingVisitor extends RecursiveAstVisitor<void> {
 
   @override
   void visitNamedType(NamedType node) {
-    final name = node.name.name;
+    final name = node.name2.lexeme;
     final probablyBuiltIn = !_startsWithUppercase.hasMatch(name);
     final nameLeaf = _leaf(
-        node.name, probablyBuiltIn ? RegionType.builtIn : RegionType.type);
+        node.name2, probablyBuiltIn ? RegionType.builtIn : RegionType.type);
 
-    final resolved = node.name.staticElement;
+    final resolved = node.element;
     if (resolved != null && nameLeaf != null) {
       highlighter._pendingResolves.add(_PendingUriResolve(resolved, nameLeaf));
     }
 
     for (final child in node.childNodes) {
-      if (child != node.name) child.accept(this);
+      child.accept(this);
     }
   }
 
