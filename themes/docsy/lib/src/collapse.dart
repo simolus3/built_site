@@ -13,7 +13,7 @@ void initCollapse() {
 }
 
 void _watch(Element button) {
-  final target = document.querySelector(button.dataset['target']!)!;
+  final target = document.querySelector(button.dataset['bs-target']!)!;
   final useWidth = target.classes.contains('width');
   final dimension = useWidth ? 'width' : 'height';
 

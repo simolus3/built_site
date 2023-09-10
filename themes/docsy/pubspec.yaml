@@ -1,6 +1,6 @@
 name: docsy
 description: Port of docsy to built_site
-version: 0.2.3
+version: 0.2.4
 
 environment:
   sdk: '>=2.15.0 <4.0.0'
