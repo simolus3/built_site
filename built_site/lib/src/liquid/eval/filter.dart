@@ -230,6 +230,9 @@ Map<String, Filter> filters = {
   'round': round,
   'startsWith': startsWith,
   'sort': sort,
+  'split': (input, args) {
+    return input.toString().split(args[0].toString());
+  },
   'times': times,
   'upcase': upcase,
   'url_decode': urlDecode,

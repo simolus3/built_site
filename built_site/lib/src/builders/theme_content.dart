@@ -102,7 +102,7 @@ class ThemeIndexer implements Builder {
         final name = url.relative(path, from: 'static/');
         if (contentFiles.add(name)) {
           final entry = TarEntry.data(
-            TarHeader(name: name),
+            TarHeader(name: name, mode: 0),
             await buildStep.readAsBytes(asset),
           );
           contents.add(entry);

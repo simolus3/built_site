@@ -24,10 +24,9 @@
 
 .tab-body {
   font-weight: $font-weight-medium;
-  background: $gray-100;
   color: inherit;
   border-radius: 0;
-  padding: 1.5rem;
+  padding: 1rem;
 
   @each $color, $value in $theme-colors {
     &-#{$color} {

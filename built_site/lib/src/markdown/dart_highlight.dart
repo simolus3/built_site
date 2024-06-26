@@ -270,9 +270,13 @@ class _HighlightingVisitor extends RecursiveAstVisitor<void> {
   @override
   void visitExtensionDeclaration(ExtensionDeclaration node) {
     _keywordLeaf(node.extensionKeyword);
-    _keywordLeaf(node.onKeyword);
-
     _visitChildrenWithTitle(node, node.name);
+  }
+
+  @override
+  void visitExtensionOnClause(ExtensionOnClause node) {
+    _keywordLeaf(node.onKeyword);
+    super.visitExtensionOnClause(node);
   }
 
   @override
