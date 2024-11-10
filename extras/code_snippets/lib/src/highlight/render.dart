@@ -7,6 +7,7 @@ import 'package:source_span/source_span.dart';
 
 import '../excerpts/excerpt.dart';
 import 'highlighter.dart';
+import 'style.dart';
 
 String _escape(String source) {
   const escaper = HtmlEscape();
@@ -17,13 +18,19 @@ class HighlightRenderer {
   final Highlighter highlighter;
   final Excerpt excerpt;
   final bool removeIndent;
+  final CodeStyleBuilder styles;
 
   String Function(
           Excerpt excerpt, ContinousRegion last, ContinousRegion upcoming)
       writePlaster;
 
   HighlightRenderer(
-      this.highlighter, this.excerpt, this.writePlaster, this.removeIndent);
+    this.highlighter,
+    this.excerpt,
+    this.writePlaster,
+    this.removeIndent,
+    this.styles,
+  );
 
   String renderHtml() {
     highlighter.foundRegions.sort((a, b) => a.source.compareTo(b.source));
@@ -76,8 +83,9 @@ class HighlightRenderer {
 
     void region(HighlightRegion region, [FileSpan? span, int stripIndent = 0]) {
       final docsUri = region.documentationUri;
+      final classes = styles.cssClassesFor(region);
 
-      buffer.write('<span class="${region.type.cssClass}">');
+      buffer.write(classes != null ? '<span class="$classes">' : '<span>');
       if (docsUri != null) {
         buffer.write('<a href="$docsUri">');
       }
@@ -164,50 +172,5 @@ class HighlightRenderer {
     }
 
     return buffer.toString();
-  }
-}
-
-extension on RegionType {
-  static const prefix = 'hljs';
-
-  String get cssClass {
-    switch (this) {
-      case RegionType.builtIn:
-        return '$prefix-built_in';
-      case RegionType.escapeCharacter:
-        return '$prefix-char escape_';
-      case RegionType.languageVariable:
-        return '$prefix-variable language_';
-      case RegionType.constantVariable:
-        return '$prefix-variable constant_';
-      case RegionType.classTitle:
-        return '$prefix-title class_';
-      case RegionType.inheritedClassTitle:
-        return '$prefix-title class_ inherited__';
-      case RegionType.functionTitle:
-        return '$prefix-title function_';
-      case RegionType.invokedFunctionTitle:
-        return '$prefix-title function_ invoked__';
-      case RegionType.metaKeyword:
-        return '$prefix-meta keyword';
-      case RegionType.metaString:
-        return '$prefix-meta string';
-      case RegionType.selectorTag:
-        return '$prefix-template-tag';
-      case RegionType.selectorId:
-        return '$prefix-template-id';
-      case RegionType.selectorClass:
-        return '$prefix-template-class';
-      case RegionType.selectorAttr:
-        return '$prefix-template-attr';
-      case RegionType.selectorPseudo:
-        return '$prefix-template-pseudo';
-      case RegionType.templateTag:
-        return '$prefix-template-tag';
-      case RegionType.templateVariable:
-        return '$prefix-template-variable';
-      default:
-        return '$prefix-$name';
-    }
   }
 }

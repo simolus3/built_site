@@ -10,6 +10,7 @@ import 'src/excerpts/excerpt.dart';
 import 'src/highlight/highlighter.dart';
 import 'src/highlight/dart/highlighter.dart';
 import 'src/highlight/render.dart';
+import 'src/highlight/style.dart';
 
 export 'src/excerpts/excerpt.dart';
 
@@ -45,9 +46,13 @@ class CodeExcerptBuilder implements Builder {
   final bool dropIndendation;
 
   final Map<String, Uri> overriddenDartDocUrls;
+  final CodeStyleBuilder styles;
 
-  CodeExcerptBuilder(
-      {this.dropIndendation = false, this.overriddenDartDocUrls = const {}});
+  CodeExcerptBuilder({
+    this.dropIndendation = false,
+    this.overriddenDartDocUrls = const {},
+    this.styles = const HighlightJsStyles(),
+  });
 
   bool shouldEmitFor(AssetId input, Excerpter excerpts) {
     return excerpts.containsDirectives;
@@ -104,7 +109,7 @@ class CodeExcerptBuilder implements Builder {
 
       for (final excerpt in excerpts.values) {
         final renderer = HighlightRenderer(
-            highlighter, excerpt, writePlaster, dropIndendation);
+            highlighter, excerpt, writePlaster, dropIndendation, styles);
         final html = renderer.renderHtml();
 
         results[excerpt.name] = html;

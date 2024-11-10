@@ -64,5 +64,5 @@ enum RegionType {
   templateTag,
   templateVariable,
   addition,
-  delection,
+  deletion,
 }

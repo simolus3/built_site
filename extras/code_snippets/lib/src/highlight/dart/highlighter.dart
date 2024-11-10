@@ -6,7 +6,6 @@ import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:build/build.dart';
-import 'package:source_span/source_span.dart';
 
 import '../highlighter.dart';
 import '../regions.dart';
@@ -28,9 +27,8 @@ class DartHighlighter extends Highlighter {
 
   final Map<String, Uri> overridenDartdocUrls;
 
-  DartHighlighter(SourceFile file, this.buildStep, this.compilationUnit,
-      this.overridenDartdocUrls)
-      : super(file);
+  DartHighlighter(super.file, this.buildStep, this.compilationUnit,
+      this.overridenDartdocUrls);
 
   @override
   Future<void> highlight() async {
@@ -295,6 +293,12 @@ class _HighlightingVisitor extends RecursiveAstVisitor<void> {
   void visitForEachPartsWithDeclaration(ForEachPartsWithDeclaration node) {
     _keyword(node.inKeyword);
     super.visitForEachPartsWithDeclaration(node);
+  }
+
+  @override
+  void visitSimpleFormalParameter(SimpleFormalParameter node) {
+    node.type?.accept(this);
+    _leaf(node.name, RegionType.variable);
   }
 
   @override
@@ -596,6 +600,13 @@ class _HighlightingVisitor extends RecursiveAstVisitor<void> {
     _keyword(node.lateKeyword);
     _keyword(node.keyword);
     super.visitVariableDeclarationList(node);
+  }
+
+  @override
+  void visitVariableDeclaration(VariableDeclaration node) {
+    _leaf(node.name, RegionType.variable);
+    _punctuation(node.equals);
+    node.initializer?.accept(this);
   }
 
   @override
