@@ -46,6 +46,12 @@ class DartIndexBuilder implements Builder {
           exportedHere.add(id);
         }
       }
+
+      // Also mark the library element itself as exported
+      final libraryId = ElementIdentifier.fromElement(library);
+      if (libraryId != null) {
+        exportedHere.add(libraryId);
+      }
     }
 
     await buildStep.writeAsString(output, json.encode(exportedByPackage));

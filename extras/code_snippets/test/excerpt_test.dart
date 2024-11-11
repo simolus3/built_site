@@ -116,6 +116,61 @@ class MyClass {
       ]),
     ]);
   });
+
+  test('skips other directives', () {
+    const source = '''
+// #docregion flutter,sqlite3,postgres
+import 'package:drift/drift.dart';
+// #enddocregion flutter,sqlite3,postgres
+
+// #docregion flutter
+import 'package:drift_flutter/drift_flutter.dart';
+// #enddocregion flutter
+// #docregion sqlite3
+import 'dart:io';
+import 'package:drift/native.dart';
+// #enddocregion sqlite3
+// #docregion postgres
+import 'package:drift_postgres/drift_postgres.dart';
+import 'package:postgres/postgres.dart' as pg;
+// #enddocregion postgres
+
+// #docregion flutter,sqlite3,postgres
+
+part 'database.g.dart';
+''';
+
+    _expectNoLogs();
+    final excerpter = Excerpter('test', source)..weave();
+    final excerpts = excerpter.excerpts.values;
+
+    expect(excerpts, [
+      Excerpt('(full)', [
+        ContinousRegion(1, 2), // import drift
+        ContinousRegion(3, 4), // Empty line after drift import
+        ContinousRegion(5, 6), // Import drift flutter
+        ContinousRegion(8, 10), // dart:io and drift/native
+        ContinousRegion(12, 14), // postgres imports
+        ContinousRegion(15, 16), // empty line after postgres imports
+        ContinousRegion(17, 19), // empty line and part
+      ]),
+      Excerpt('flutter', [
+        ContinousRegion(1, 2), // import drift
+        ContinousRegion(5, 6), // Import drift flutter
+        ContinousRegion(17, 19), // empty line and part
+      ]),
+      Excerpt('sqlite3', [
+        ContinousRegion(1, 2), // import drift
+        ContinousRegion(8, 10), // dart:io and drift/native
+        ContinousRegion(17, 19), // empty line and part
+      ]),
+      Excerpt('postgres', [
+        ContinousRegion(1, 2), // import drift
+        ContinousRegion(12, 14), // postgres imports
+        ContinousRegion(17, 19), // empty line and part
+      ]),
+    ]);
+  });
 }
 
 void testSingle(String source, int startLine, int endLine) {

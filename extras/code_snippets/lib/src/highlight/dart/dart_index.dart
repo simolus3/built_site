@@ -63,16 +63,15 @@ class DartIndex {
   Future<AssetId?> findImportForElement(
       Element element, BuildStep buildStep) async {
     // First, find a top-level ancestor of the element
-    final topLevelAncestor = element.thisOrAncestorMatchingNullable(
-        (el) => el.enclosingElement is CompilationUnitElement);
+    final enclosingLibrary = element.library;
 
-    if (topLevelAncestor == null) return null;
+    if (enclosingLibrary == null) return null;
 
     try {
-      final id = await buildStep.resolver.assetIdForElement(topLevelAncestor);
+      final id = await buildStep.resolver.assetIdForElement(enclosingLibrary);
       await _loadPackage(id.package, buildStep);
 
-      return _knownImports[ElementIdentifier.fromElement(topLevelAncestor)];
+      return _knownImports[ElementIdentifier.fromElement(enclosingLibrary)];
     } on UnresolvableAssetException {
       // ignore
       return null;

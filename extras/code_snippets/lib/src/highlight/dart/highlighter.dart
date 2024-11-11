@@ -363,7 +363,17 @@ class _HighlightingVisitor extends RecursiveAstVisitor<void> {
     _keyword(node.importKeyword);
     _keyword(node.deferredKeyword);
     _keyword(node.asKeyword);
-    super.visitImportDirective(node);
+
+    final stringRegion = _leaf(node.uri, RegionType.string);
+    final importedLibrary = node.element;
+
+    if (importedLibrary != null && stringRegion != null) {
+      highlighter._pendingResolves
+          .add(_PendingUriResolve(importedLibrary, stringRegion));
+    }
+
+    node.metadata.accept(this);
+    node.combinators.accept(this);
   }
 
   @override
