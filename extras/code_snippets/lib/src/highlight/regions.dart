@@ -40,6 +40,7 @@ enum RegionType {
   invokedFunctionTitle,
   params,
   comment,
+  commentSingleLine,
   doctag,
   meta,
   metaKeyword,

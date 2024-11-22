@@ -64,6 +64,7 @@ final class PygmentStyles implements CodeStyleBuilder {
       RegionType.number => 'm',
       RegionType.operator => 'o',
       RegionType.comment => 'c',
+      RegionType.commentSingleLine => 'c1',
       RegionType.doctag => 'cs',
       RegionType.string => 's',
       RegionType.punctuation => 'p',

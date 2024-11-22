@@ -41,7 +41,11 @@ class DartHighlighter extends Highlighter {
     while (token != null) {
       Token? commentToken = token.precedingComments;
       while (commentToken != null) {
-        report(HighlightRegion(RegionType.comment,
+        final span = file.span(commentToken.offset, commentToken.end);
+        final multiline = span.start.line != span.end.line;
+
+        report(HighlightRegion(
+            multiline ? RegionType.comment : RegionType.commentSingleLine,
             file.span(commentToken.offset, commentToken.end)));
         commentToken = commentToken.next;
       }
@@ -64,14 +68,6 @@ class DartHighlighter extends Highlighter {
       if (import != null) {
         reference.region.documentationUri =
             _dartDocUri(import, reference.element);
-      } else {
-        final element = reference.element;
-        final id = ElementIdentifier.fromElement(element);
-
-        if (id != null) {
-          reference.region.documentationUri =
-              id.definedSource.replace(port: id.offsetInSource);
-        }
       }
     }
 
