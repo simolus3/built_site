@@ -64,6 +64,14 @@ class DartHighlighter extends Highlighter {
       if (import != null) {
         reference.region.documentationUri =
             _dartDocUri(import, reference.element);
+      } else {
+        final element = reference.element;
+        final id = ElementIdentifier.fromElement(element);
+
+        if (id != null) {
+          reference.region.documentationUri =
+              id.definedSource.replace(port: id.offsetInSource);
+        }
       }
     }
 
@@ -269,10 +277,15 @@ class _HighlightingVisitor extends RecursiveAstVisitor<void> {
   @override
   void visitExtensionDeclaration(ExtensionDeclaration node) {
     _keyword(node.extensionKeyword);
-    _keyword(node.onKeyword);
 
     _leaf(node.name, RegionType.classTitle);
     super.visitExtensionDeclaration(node);
+  }
+
+  @override
+  void visitExtensionOnClause(ExtensionOnClause node) {
+    _keyword(node.onKeyword);
+    super.visitExtensionOnClause(node);
   }
 
   @override
@@ -365,7 +378,7 @@ class _HighlightingVisitor extends RecursiveAstVisitor<void> {
     _keyword(node.asKeyword);
 
     final stringRegion = _leaf(node.uri, RegionType.string);
-    final importedLibrary = node.element;
+    final importedLibrary = node.element?.importedLibrary;
 
     if (importedLibrary != null && stringRegion != null) {
       highlighter._pendingResolves

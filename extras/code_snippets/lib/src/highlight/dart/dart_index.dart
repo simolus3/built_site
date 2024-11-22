@@ -62,16 +62,31 @@ class DartIndex {
 
   Future<AssetId?> findImportForElement(
       Element element, BuildStep buildStep) async {
-    // First, find a top-level ancestor of the element
-    final enclosingLibrary = element.library;
+    Element? possiblyExported;
 
-    if (enclosingLibrary == null) return null;
+    // The element itself might be something nested like a getter in a class.
+    // Here, we should check if the surrounding class might be exported.
+    if (element is LibraryElement) {
+      possiblyExported = element;
+    } else {
+      possiblyExported = element.thisOrAncestorMatchingNullable(
+          (el) => el.enclosingElement is CompilationUnitElement);
+    }
 
+    if (possiblyExported == null) {
+      return null;
+    }
+
+    return await _importUriForExportedElement(possiblyExported, buildStep);
+  }
+
+  Future<AssetId?> _importUriForExportedElement(
+      Element element, BuildStep buildStep) async {
     try {
-      final id = await buildStep.resolver.assetIdForElement(enclosingLibrary);
+      final id = await buildStep.resolver.assetIdForElement(element);
       await _loadPackage(id.package, buildStep);
 
-      return _knownImports[ElementIdentifier.fromElement(enclosingLibrary)];
+      return _knownImports[ElementIdentifier.fromElement(element)];
     } on UnresolvableAssetException {
       // ignore
       return null;

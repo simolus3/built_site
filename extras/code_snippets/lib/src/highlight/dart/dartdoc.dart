@@ -77,7 +77,7 @@ Uri documentationForElement(
 
       final field = element is FieldElement
           ? element
-          : (element as PropertyAccessorElement).variable;
+          : (element as PropertyAccessorElement).variable2;
 
       if (field is FieldElement) {
         if (field.isEnumConstant) {

@@ -18,7 +18,7 @@ abstract class Highlighter {
 }
 
 class NullHighlighter extends Highlighter {
-  NullHighlighter(SourceFile file) : super(file);
+  NullHighlighter(super.file);
 
   @override
   void highlight() {}
