@@ -63,7 +63,7 @@ class DartHighlighter extends Highlighter {
 
     for (final reference in _pendingResolves) {
       final import =
-          await index.findImportForElement(reference.element, buildStep);
+          await index.publicLibraryForElement(reference.element, buildStep);
 
       if (import != null) {
         reference.region.documentationUri =
@@ -74,12 +74,11 @@ class DartHighlighter extends Highlighter {
     _pendingResolves.clear();
   }
 
-  Uri _dartDocUri(AssetId import, Element element) {
-    final libraryName = import.path;
-    final base = overridenDartdocUrls[import.package] ??
-        defaultDocumentationUri(import.package);
+  Uri _dartDocUri(PublicLibrary library, Element element) {
+    final base = overridenDartdocUrls[library.id.package] ??
+        defaultDocumentationUri(library.id.package);
 
-    return documentationForElement(element, libraryName, base);
+    return documentationForElement(element, library.dirName, base);
   }
 }
 

@@ -2,10 +2,11 @@ import 'dart:convert';
 
 import 'package:analyzer/dart/element/element.dart';
 import 'package:build/build.dart';
-import 'package:meta/meta.dart';
+import 'package:path/path.dart' show url;
 
-@sealed
-class ElementIdentifier {
+import 'export_canonicalization.dart';
+
+final class ElementIdentifier {
   final Uri definedSource;
   final int offsetInSource;
 
@@ -45,22 +46,119 @@ class ElementIdentifier {
   }
 }
 
+final class PublicLibrary {
+  final AssetId id;
+  final List<ElementIdentifier> exportedElements;
+  final String dartDocName;
+  final String dirName;
+  final bool isDeprecated;
+
+  PublicLibrary._(this.id, this.exportedElements, this.dirName,
+      this.dartDocName, this.isDeprecated);
+
+  factory PublicLibrary.fromJson(Map<String, Object?> json) {
+    return PublicLibrary._(
+      AssetId.deserialize(json['id'] as List),
+      [
+        for (final entry in json['exportedElements'] as List)
+          ElementIdentifier.fromJson(entry),
+      ],
+      json['dirName'] as String,
+      json['dartDocName'] as String,
+      json['isDeprecated'] as bool,
+    );
+  }
+
+  factory PublicLibrary(AssetId id, LibraryElement element) {
+    final exportedHere = <ElementIdentifier>[];
+
+    for (final export in element.exportNamespace.definedNames.values) {
+      final id = ElementIdentifier.fromElement(export);
+      if (id != null) {
+        exportedHere.add(id);
+      }
+    }
+
+    // Also mark the library element itself as exported
+    final libraryId = ElementIdentifier.fromElement(element);
+    if (libraryId != null) {
+      exportedHere.add(libraryId);
+    }
+
+    return PublicLibrary._(
+      id,
+      exportedHere,
+      _computeDirName(element, id),
+      _computeDartDocName(element, id),
+      element.hasDeprecated,
+    );
+  }
+
+  Map<String, Object?> toJson() {
+    return {
+      'id': id.serialize(),
+      'exportedElements': [
+        for (final element in exportedElements) element.toJson(),
+      ],
+      'dartDocName': dartDocName,
+      'dirName': dirName,
+      'isDeprecated': isDeprecated,
+    };
+  }
+
+  static String _computeDirName(LibraryElement element, AssetId id) {
+    // Ported over from https://github.com/dart-lang/dartdoc/blob/e1295863b11c54680bf178ec9c2662a33b0e24be/lib/src/model/library.dart#L164
+    final name = element.name;
+    String nameFromPath;
+    if (name.isEmpty) {
+      nameFromPath = url.relative('/${id.path}', from: '/lib');
+      if (nameFromPath.endsWith('.dart')) {
+        const dartExtensionLength = '.dart'.length;
+        nameFromPath = nameFromPath.substring(
+            0, nameFromPath.length - dartExtensionLength);
+      }
+    } else {
+      nameFromPath = name;
+    }
+
+    // Turn `package:foo/bar/baz` into `package-foo_bar_baz`.
+    return nameFromPath.replaceAll(':', '-').replaceAll('/', '_');
+  }
+
+  static String _computeDartDocName(LibraryElement element, AssetId id) {
+    var source = element.source;
+    if (source.uri.isScheme('dart')) {
+      // There are inconsistencies in library naming + URIs for the Dart
+      // SDK libraries; we rationalize them here.
+      if (source.uri.toString().contains('/')) {
+        return element.name.replaceFirst('dart.', 'dart:');
+      }
+      return source.uri.toString();
+    } else if (element.name.isNotEmpty) {
+      // An empty name indicates that the library is "implicitly named" with the
+      // empty string. That is, it either has no `library` directive, or it has
+      // a `library` directive with no name.
+      return element.name;
+    }
+
+    var baseName = url.basename(id.path);
+    if (baseName.endsWith('.dart')) {
+      const dartExtensionLength = '.dart'.length;
+      return baseName.substring(0, baseName.length - dartExtensionLength);
+    }
+    return baseName;
+  }
+}
+
 class DartIndex {
   static final _resource = Resource(DartIndex.new);
 
   static Future<DartIndex> of(BuildStep step) => step.fetchResource(_resource);
 
   final List<String> _loadedPackages = [];
-  final Map<ElementIdentifier, AssetId> _knownImports = {};
+  final Map<ElementIdentifier, List<PublicLibrary>> _knownImports = {};
 
-  /// Map from any top-level (parent is a library) element to the proper asset
-  /// id to import for this element.
-  ///
-  /// For elements in `src/`, this attempts to find a public `lib/` import which
-  /// exports said element.
-  final Map<ElementIdentifier, AssetId> topLevelMembersToProperImport = {};
-
-  Future<AssetId?> findImportForElement(
+  Future<PublicLibrary?> publicLibraryForElement(
       Element element, BuildStep buildStep) async {
     Element? possiblyExported;
 
@@ -80,13 +178,23 @@ class DartIndex {
     return await _importUriForExportedElement(possiblyExported, buildStep);
   }
 
-  Future<AssetId?> _importUriForExportedElement(
+  Future<PublicLibrary?> _importUriForExportedElement(
       Element element, BuildStep buildStep) async {
     try {
       final id = await buildStep.resolver.assetIdForElement(element);
       await _loadPackage(id.package, buildStep);
 
-      return _knownImports[ElementIdentifier.fromElement(element)];
+      final elementId = ElementIdentifier.fromElement(element);
+      final candidates = _knownImports[elementId];
+      if (elementId == null || candidates == null || candidates.isEmpty) {
+        return null;
+      }
+
+      if (candidates case [final candidate]) {
+        return candidate;
+      }
+
+      return Canonicalization(elementId).canonicalLibraryCandidate(candidates);
     } on UnresolvableAssetException {
       // ignore
       return null;
@@ -98,20 +206,14 @@ class DartIndex {
     final indexExists = await buildStep.canRead(index);
 
     if (!_loadedPackages.contains(package) && indexExists) {
-      final decl = json.decode(await buildStep.readAsString(index))
-          as Map<String, Object?>;
+      final decl = json.decode(await buildStep.readAsString(index)) as List;
 
-      decl.forEach((library, elements) {
-        final import = AssetId(package, library);
-
-        final parsedElements = (elements as List)
-            .cast<Map<String, Object?>>()
-            .map(ElementIdentifier.fromJson);
-
-        for (final element in parsedElements) {
-          _knownImports[element] = import;
+      for (final entry in decl) {
+        final library = PublicLibrary.fromJson(entry as Map<String, Object?>);
+        for (final exportedElement in library.exportedElements) {
+          _knownImports.putIfAbsent(exportedElement, () => []).add(library);
         }
-      });
+      }
 
       _loadedPackages.add(package);
     }
