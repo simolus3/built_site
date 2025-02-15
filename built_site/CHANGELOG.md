@@ -1,3 +1,7 @@
+## 0.2.18
+
+- Support latest analyzer.
+
 ## 0.2.16
 
 - Update dependencies
