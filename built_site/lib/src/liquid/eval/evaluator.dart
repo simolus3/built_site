@@ -182,11 +182,13 @@ class TemplateEvaluator
     await template.accept(
         this, arg.fork(args: additionalVariables, buffer: resultBuffer));
     if (isEmittingMarkdown) {
-      final lines =
-          const LineSplitter().convert(resultBuffer.toString()).length;
-      arg.buffer
-          .writeln('$embeddRawHtml ${lines + 1} \n ${resultBuffer.toString()}');
+      arg.buffer.writeln(escapeHtmlForMarkdown(resultBuffer.toString()));
     }
+  }
+
+  static String escapeHtmlForMarkdown(String html) {
+    final lines = const LineSplitter().convert(html).length;
+    return ('$embeddRawHtml ${lines + 1} \n $html');
   }
 
   @override

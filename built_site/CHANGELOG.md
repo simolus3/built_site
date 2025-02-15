@@ -1,3 +1,7 @@
+## 0.2.19
+
+- Add `rawHtml` filter to include raw HTML in markdown documents.
+
 ## 0.2.18
 
 - Support latest analyzer.

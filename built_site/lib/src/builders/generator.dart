@@ -259,7 +259,14 @@ class SiteGenerator extends Builder {
             final asset =
                 AssetId.resolve(Uri.parse(input.toString()), from: sourceId);
             return buildStep.readAsString(asset);
-          }
+          },
+          'rawHtml': (input, args) async {
+            if (outputMarkdown) {
+              return TemplateEvaluator.escapeHtmlForMarkdown(input.toString());
+            } else {
+              return input;
+            }
+          },
         },
       );
     }
