@@ -1,13 +1,13 @@
 name: code_snippets
 description: Experimental builder for dealing with code snippets.
-version: 0.0.16
+version: 0.0.18
 publish_to: none
 
 environment:
   sdk: '^3.3.0'
 
 dependencies:
-  analyzer: ^6.5.0
+  analyzer: ^7.3.0
   build: ^2.2.1
   collection: ^1.15.0
   glob: ^2.1.0

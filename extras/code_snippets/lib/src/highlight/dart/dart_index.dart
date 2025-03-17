@@ -168,7 +168,7 @@ class DartIndex {
       possiblyExported = element;
     } else {
       possiblyExported = element.thisOrAncestorMatchingNullable(
-          (el) => el.enclosingElement is CompilationUnitElement);
+          (el) => el.enclosingElement3 is CompilationUnitElement);
     }
 
     if (possiblyExported == null) {
@@ -226,7 +226,7 @@ extension on Element {
   ) {
     Element? element = this;
     while (element != null && !predicate(element)) {
-      element = element.enclosingElement;
+      element = element.enclosingElement3;
     }
     return element as E?;
   }

@@ -1,6 +1,6 @@
 name: built_site
 description: Build static websites using Dart's build system
-version: 0.2.19
+version: 0.2.20
 # homepage: https://www.example.com
 
 environment:

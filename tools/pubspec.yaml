@@ -13,4 +13,4 @@ dependencies:
     hosted: https://pub-simonbinder-eu.fsn1.your-objectstorage.com
 
 dev_dependencies:
-  lints: ^1.0.0
+  lints: ^5.0.0
