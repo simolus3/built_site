@@ -4,7 +4,7 @@ import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/syntactic_entity.dart';
 import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
-import 'package:analyzer/dart/element/element.dart';
+import 'package:analyzer/dart/element/element2.dart';
 import 'package:build/build.dart';
 
 import '../highlighter.dart';
@@ -13,7 +13,7 @@ import 'dart_index.dart';
 import 'dartdoc.dart';
 
 class _PendingUriResolve {
-  final Element element;
+  final Element2 element;
   final HighlightRegion region;
 
   _PendingUriResolve(this.element, this.region);
@@ -74,7 +74,7 @@ class DartHighlighter extends Highlighter {
     _pendingResolves.clear();
   }
 
-  Uri _dartDocUri(PublicLibrary library, Element element) {
+  Uri _dartDocUri(PublicLibrary library, Element2 element) {
     final base = overridenDartdocUrls[library.id.package] ??
         defaultDocumentationUri(library.id.package);
 
@@ -201,7 +201,7 @@ class _HighlightingVisitor extends RecursiveAstVisitor<void> {
     final name = node.constructorName;
     name.type.accept(this);
     final nameLeaf = _leaf(name.name, RegionType.invokedFunctionTitle);
-    final reference = node.constructorName.staticElement;
+    final reference = node.constructorName.element;
     if (reference != null && nameLeaf != null) {
       highlighter._pendingResolves.add(_PendingUriResolve(reference, nameLeaf));
     }
@@ -373,7 +373,7 @@ class _HighlightingVisitor extends RecursiveAstVisitor<void> {
     _keyword(node.asKeyword);
 
     final stringRegion = _leaf(node.uri, RegionType.string);
-    final importedLibrary = node.element?.importedLibrary;
+    final importedLibrary = node.libraryImport?.importedLibrary2;
 
     if (importedLibrary != null && stringRegion != null) {
       highlighter._pendingResolves
@@ -440,9 +440,9 @@ class _HighlightingVisitor extends RecursiveAstVisitor<void> {
   @override
   void visitMethodInvocation(MethodInvocation node) {
     _punctuation(node.operator);
-    final calledFunction = node.methodName.staticElement;
+    final calledFunction = node.methodName.element;
     final isConstructor = calledFunction != null
-        ? calledFunction is ConstructorElement
+        ? calledFunction is ConstructorElement2
         : node.realTarget == null &&
             _startsWithUppercase.hasMatch(node.methodName.name);
 
@@ -468,7 +468,7 @@ class _HighlightingVisitor extends RecursiveAstVisitor<void> {
     final nameLeaf = _leaf(
         node.name2, probablyBuiltIn ? RegionType.builtIn : RegionType.type);
 
-    final resolved = node.element;
+    final resolved = node.element2;
     if (resolved != null && nameLeaf != null) {
       highlighter._pendingResolves.add(_PendingUriResolve(resolved, nameLeaf));
     }
@@ -525,17 +525,17 @@ class _HighlightingVisitor extends RecursiveAstVisitor<void> {
 
   @override
   void visitSimpleIdentifier(SimpleIdentifier node) {
-    final target = node.staticElement;
+    final target = node.element;
     HighlightRegion? region;
 
     if (node.parent is Annotation) {
       region = _leaf(node, RegionType.meta);
     } else {
-      if (target is VariableElement || target is PropertyAccessorElement) {
+      if (target is VariableElement2 || target is PropertyAccessorElement2) {
         region = _leaf(node, RegionType.variable);
-      } else if (target is FunctionTypedElement) {
+      } else if (target is FunctionTypedElement2) {
         region = _leaf(node, RegionType.functionTitle);
-      } else if (target is ClassElement) {
+      } else if (target is ClassElement2) {
         region = _leaf(node, RegionType.classTitle);
       } else if (node.parent is MethodDeclaration ||
           node.parent is FunctionDeclaration) {

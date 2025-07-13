@@ -50,15 +50,15 @@ void main() {
       outputs: {
         'a|lib/a.dart.excerpt.json': json.encode({
           '(full)': '''
-<span class="hljs-built_in">void</span> <span class="hljs-title function_">main</span>() <span class="hljs-punctuation">{</span>
+<span class="hljs-built_in">void</span> main() <span class="hljs-punctuation">{</span>
   <span class="hljs-number">1</span> + <span class="hljs-number">2</span>;
 
-  <span class="hljs-string">'foo'</span>;
+  <span class="hljs-string">&#39;foo&#39;</span>;
 <span class="hljs-punctuation">}</span>''',
           'main': '''
 <span class="hljs-number">1</span> + <span class="hljs-number">2</span>;
 
-<span class="hljs-string">'foo'</span>;''',
+<span class="hljs-string">&#39;foo&#39;</span>;''',
         }),
       },
     );

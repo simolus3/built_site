@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:analyzer/dart/element/element.dart';
+import 'package:analyzer/dart/element/element2.dart';
 import 'package:build/build.dart';
 import 'package:path/path.dart' show url;
 
@@ -12,12 +12,12 @@ final class ElementIdentifier {
 
   ElementIdentifier(this.definedSource, this.offsetInSource);
 
-  static ElementIdentifier? fromElement(Element element) {
-    final declaration = element.declaration;
-    final source = declaration?.source;
-    if (declaration == null || source == null) return null;
+  static ElementIdentifier? fromElement(Element2 element) {
+    final uri = element.library2?.uri;
+    final offset = element.firstFragment.nameOffset2;
+    if (uri == null || offset == null) return null;
 
-    return ElementIdentifier(source.uri, declaration.nameOffset);
+    return ElementIdentifier(uri, offset);
   }
 
   factory ElementIdentifier.fromJson(Map<String, Object?> json) {
@@ -69,10 +69,10 @@ final class PublicLibrary {
     );
   }
 
-  factory PublicLibrary(AssetId id, LibraryElement element) {
+  factory PublicLibrary(AssetId id, LibraryElement2 element) {
     final exportedHere = <ElementIdentifier>[];
 
-    for (final export in element.exportNamespace.definedNames.values) {
+    for (final export in element.exportNamespace.definedNames2.values) {
       final id = ElementIdentifier.fromElement(export);
       if (id != null) {
         exportedHere.add(id);
@@ -90,7 +90,7 @@ final class PublicLibrary {
       exportedHere,
       _computeDirName(element, id),
       _computeDartDocName(element, id),
-      element.hasDeprecated,
+      element.metadata2.hasDeprecated,
     );
   }
 
@@ -106,11 +106,11 @@ final class PublicLibrary {
     };
   }
 
-  static String _computeDirName(LibraryElement element, AssetId id) {
+  static String _computeDirName(LibraryElement2 element, AssetId id) {
     // Ported over from https://github.com/dart-lang/dartdoc/blob/e1295863b11c54680bf178ec9c2662a33b0e24be/lib/src/model/library.dart#L164
-    final name = element.name;
+    final name = element.name3;
     String nameFromPath;
-    if (name.isEmpty) {
+    if (name == null || name.isEmpty) {
       nameFromPath = url.relative('/${id.path}', from: '/lib');
       if (nameFromPath.endsWith('.dart')) {
         const dartExtensionLength = '.dart'.length;
@@ -125,20 +125,20 @@ final class PublicLibrary {
     return nameFromPath.replaceAll(':', '-').replaceAll('/', '_');
   }
 
-  static String _computeDartDocName(LibraryElement element, AssetId id) {
-    var source = element.source;
-    if (source.uri.isScheme('dart')) {
+  static String _computeDartDocName(LibraryElement2 element, AssetId id) {
+    var uri = element.uri;
+    if (uri.isScheme('dart')) {
       // There are inconsistencies in library naming + URIs for the Dart
       // SDK libraries; we rationalize them here.
-      if (source.uri.toString().contains('/')) {
-        return element.name.replaceFirst('dart.', 'dart:');
+      if (uri.toString().contains('/')) {
+        return element.name3!.replaceFirst('dart.', 'dart:');
       }
-      return source.uri.toString();
-    } else if (element.name.isNotEmpty) {
+      return uri.toString();
+    } else if (element.name3 != null && element.name3!.isNotEmpty) {
       // An empty name indicates that the library is "implicitly named" with the
       // empty string. That is, it either has no `library` directive, or it has
       // a `library` directive with no name.
-      return element.name;
+      return element.name3!;
     }
 
     var baseName = url.basename(id.path);
@@ -159,16 +159,15 @@ class DartIndex {
   final Map<ElementIdentifier, List<PublicLibrary>> _knownImports = {};
 
   Future<PublicLibrary?> publicLibraryForElement(
-      Element element, BuildStep buildStep) async {
-    Element? possiblyExported;
+      Element2 element, BuildStep buildStep) async {
+    Element2? possiblyExported;
 
     // The element itself might be something nested like a getter in a class.
     // Here, we should check if the surrounding class might be exported.
-    if (element is LibraryElement) {
+    if (element is LibraryElement2) {
       possiblyExported = element;
     } else {
-      possiblyExported = element.thisOrAncestorMatchingNullable(
-          (el) => el.enclosingElement3 is CompilationUnitElement);
+      possiblyExported = element.library2;
     }
 
     if (possiblyExported == null) {
@@ -179,7 +178,7 @@ class DartIndex {
   }
 
   Future<PublicLibrary?> _importUriForExportedElement(
-      Element element, BuildStep buildStep) async {
+      Element2 element, BuildStep buildStep) async {
     try {
       final id = await buildStep.resolver.assetIdForElement(element);
       await _loadPackage(id.package, buildStep);
@@ -217,17 +216,5 @@ class DartIndex {
 
       _loadedPackages.add(package);
     }
-  }
-}
-
-extension on Element {
-  E? thisOrAncestorMatchingNullable<E extends Element>(
-    bool Function(Element) predicate,
-  ) {
-    Element? element = this;
-    while (element != null && !predicate(element)) {
-      element = element.enclosingElement3;
-    }
-    return element as E?;
   }
 }

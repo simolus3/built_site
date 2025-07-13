@@ -1,4 +1,4 @@
-import 'package:analyzer/dart/element/element.dart';
+import 'package:analyzer/dart/element/element2.dart';
 import 'package:path/path.dart';
 
 // https://github.com/dart-lang/dartdoc/blob/f39f5e2880d6513bf47ef7a749e0dd672de33c04/lib/src/comment_references/parser.dart#L10
@@ -31,58 +31,57 @@ Uri defaultDocumentationUri(String package, {String version = 'latest'}) {
 }
 
 Uri documentationForElement(
-    Element element, String publicLibrary, Uri baseUri) {
+    Element2 element, String publicLibrary, Uri baseUri) {
   final reversePath = <String>[];
 
-  void buildPathAsParent(Element element) {
-    if (element is ClassElement) {
-      reversePath.add(element.name);
-    } else if (element is ExtensionElement) {
+  void buildPathAsParent(Element2 element) {
+    if (element is ClassElement2) {
+      reversePath.add(element.name3!);
+    } else if (element is ExtensionElement2) {
       // The name has to be non-null, otherwise it wouldn't be an exported
       // element.
-      reversePath.add(element.name!);
+      reversePath.add(element.name3!);
     }
   }
 
-  void buildPath(Element element) {
-    if (element is LibraryElement) {
+  void buildPath(Element2 element) {
+    if (element is LibraryElement2) {
       reversePath.add('$publicLibrary-library.html');
-    } else if (element is ClassElement) {
-      reversePath.add('${element.name}-class.html');
-    } else if (element is EnumElement) {
-      reversePath.add('${element.name}.html');
-    } else if (element is ExtensionElement) {
-      reversePath.add('${element.name}.html');
-    } else if (element is TypeAliasElement) {
-      reversePath.add('${element.name}.html');
-    } else if (element is FunctionElement) {
-      reversePath.add('${element.name}.html');
-    } else if (element is ConstructorElement) {
-      var constructorName = element.enclosingElement3.name;
-      if (element.name.isNotEmpty) {
-        constructorName += '.${element.name}';
+    } else if (element is ClassElement2) {
+      reversePath.add('${element.name3}-class.html');
+    } else if (element is EnumElement2) {
+      reversePath.add('${element.name3}.html');
+    } else if (element is ExtensionElement2) {
+      reversePath.add('${element.name3}.html');
+    } else if (element is TypeAliasElement2) {
+      reversePath.add('${element.name3}.html');
+    } else if (element is ConstructorElement2) {
+      var constructorName = element.enclosingElement2.name3!;
+      if (element.name3 != 'new') {
+        constructorName += '.${element.name3}';
       }
 
       reversePath.add('$constructorName.html');
-      buildPathAsParent(element.enclosingElement3);
-    } else if (element is MethodElement) {
+      buildPathAsParent(element.enclosingElement2);
+    } else if (element is MethodElement2) {
       var name = element.isOperator
-          ? 'operator_${_operatorNames[element.name]}'
-          : element.name;
+          ? 'operator_${_operatorNames[element.name3]}'
+          : element.name3;
 
       reversePath.add('$name.html');
-      buildPathAsParent(element.enclosingElement3);
-    } else if (element is FieldElement || element is PropertyAccessorElement) {
-      var name = '${element.name}';
+      buildPathAsParent(element.enclosingElement2!);
+    } else if (element is FieldElement2 ||
+        element is PropertyAccessorElement2) {
+      var name = '${element.name3}';
 
-      final field = element is FieldElement
+      final field = element is FieldElement2
           ? element
-          : (element as PropertyAccessorElement).variable2;
+          : (element as PropertyAccessorElement2).variable3;
 
-      if (field is FieldElement) {
+      if (field is FieldElement2) {
         if (field.isEnumConstant) {
           // Enum constants don't get their own dartdoc page, link to enum
-          buildPathAsParent(field.enclosingElement3);
+          buildPathAsParent(field.enclosingElement2);
           return;
         }
 
@@ -92,9 +91,9 @@ Uri documentationForElement(
       }
 
       reversePath.add('$name.html');
-      buildPathAsParent(element.enclosingElement3!);
+      buildPathAsParent(element.enclosingElement2!);
     } else {
-      final parent = element.enclosingElement3;
+      final parent = element.enclosingElement2;
       if (parent != null) {
         buildPath(parent);
       }

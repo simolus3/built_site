@@ -64,8 +64,9 @@ class CodeExcerptBuilder implements Builder {
       case '.dart':
         final source = SourceFile.fromString(content, url: assetId.uri);
         final library = await buildStep.inputLibrary;
-        var resolvedUnit =
-            await library.session.getResolvedUnit(library.source.fullName);
+
+        var resolvedUnit = await library.session
+            .getResolvedUnit(library.firstFragment.source.fullName);
         CompilationUnit unit;
 
         if (resolvedUnit is ResolvedUnitResult) {
