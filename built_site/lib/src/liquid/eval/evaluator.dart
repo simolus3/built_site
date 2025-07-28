@@ -385,6 +385,6 @@ class EvaluationException implements Exception {
     final span = node.span;
     if (span == null) return cause.toString();
 
-    return 'Error evaluating ${span.file.url}: \n${span.message(cause.toString())}';
+    return 'Error evaluating ${span.file.url}:\n${span.message(cause.toString())}';
   }
 }

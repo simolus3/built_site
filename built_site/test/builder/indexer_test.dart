@@ -14,6 +14,7 @@ void main() {
         'a|pages/foo/index.page_meta': '',
         'a|pages/bar/index.page_meta': '',
       },
+      isInput: (_) => true,
       generateFor: {r'a|$package$'},
       outputs: <String, String>{
         'a|lib/site_index.json': json.encode(

@@ -5,7 +5,9 @@ import 'package:test/test.dart';
 
 void main() {
   final resolver = TemplateResolver(SiteConfig.fromJson('a', const {}));
-  final evaluator = TemplateEvaluator(StubAssetReader(), resolver);
+  final readerWriter = TestReaderWriter();
+
+  final evaluator = TemplateEvaluator(readerWriter, resolver);
 
   group('evaluates', () {
     final expressions = {'-3': '-3'};
@@ -87,7 +89,7 @@ void main() {
       '{{ "foo" | throw }}',
       url: Uri.parse('package:foo/bar.html'),
     );
-    final evaluator = TemplateEvaluator(StubAssetReader(), resolver);
+    final evaluator = TemplateEvaluator(readerWriter, resolver);
     expect(
       evaluator.render(component, additionalFilters: {
         'throw': (input, args) => throw StateError('expected')
@@ -96,7 +98,7 @@ void main() {
         (e) => e.toString(),
         'toString()',
         '''
-Error evaluating package:foo/bar.html: 
+Error evaluating package:foo/bar.html:
 line 1, column 4 of package:foo/bar.html: Bad state: expected
   ╷
 1 │ {{ "foo" | throw }}
@@ -114,7 +116,7 @@ line 1, column 4 of package:foo/bar.html: Bad state: expected
 { { }}
 ''');
 
-    final evaluator = TemplateEvaluator(StubAssetReader(), resolver);
+    final evaluator = TemplateEvaluator(readerWriter, resolver);
     expect(evaluator.render(template), completion('''
 test
 {}
