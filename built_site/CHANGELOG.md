@@ -1,3 +1,7 @@
+## 0.2.23
+
+- Support version 4 of `package:build`.
+
 ## 0.2.19
 
 - Add `rawHtml` filter to include raw HTML in markdown documents.
