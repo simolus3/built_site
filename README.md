@@ -1,5 +1,10 @@
 # built_site
 
+__Note__: I'm not actively maintaining `built_site` anymore, I've migrated my projects to use
+[jaspr content](https://docs.jaspr.site/content) instead.
+
+This repository still contains the original sources and some tools related to jaspr.
+
 built_site is a static site generator, built entirely on top of Dart's [build system](https://github.com/dart-lang/build/).
 
 ## Warning
