@@ -1,6 +1,6 @@
 name: jaspr_docsy
 description: A port of the Docsy documentation theme to jaspr_content.
-version: 0.0.1
+version: 0.0.2
 
 environment:
   sdk: ^3.9.0
@@ -9,3 +9,7 @@ dependencies:
   jaspr: ^0.21.3
   jaspr_content: ^0.4.1
   universal_web: ^1.1.1
+
+  bootstrap:
+    hosted: https://pub-simonbinder-eu.fsn1.your-objectstorage.com
+    version: ^5.3.8
