@@ -1,9 +1,0 @@
-<ul class="td-footer__links-list">
-    {% for link in links %}
-    <li class="td-footer__links-item" data-bs-toggle="tooltip" title="{{ link.name }}" title="{{ link.name }}">
-      <a target="_blank" rel="noopener noreferrer" href="{{ link.url }}" aria-label="{{ link.name }}">
-        <i class="{{ link.icon }}"></i>
-      </a>
-    </li>
-    {% endfor %}
-</ul>

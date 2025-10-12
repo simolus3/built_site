@@ -53,7 +53,7 @@ class _SectionTreeNode {
   AssetId? page;
 
   // ignore: unused_element, https://github.com/dart-lang/sdk/issues/49007
-  _SectionTreeNode(this.parent, [this.page]);
+  _SectionTreeNode(this.parent);
 
   void insert(AssetId id) {
     // Removing the file name (index.whatever) since we only care about the

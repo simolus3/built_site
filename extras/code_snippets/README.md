@@ -1,5 +1,8 @@
 # code_snippets
 
+__NOTE__: A more modern variant of this package is available for Jaspr [here](https://pub.dev/packages/jaspr_content_snippets).
+I'm not using this package anymore, it's not maintained.
+
 Builders to deal with code snippets extraced from source files.
 
 Extracting snippets from source files is helpful as they can then be tested

@@ -1,3 +1,0 @@
-contributes:
-  sass: lib/style.scss
-  dart: lib/main.dart
