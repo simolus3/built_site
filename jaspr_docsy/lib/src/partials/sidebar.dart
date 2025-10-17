@@ -1,5 +1,7 @@
 import 'package:jaspr/server.dart';
 
+import '../../components/internal/sidebar_toggle.dart';
+
 final class Sidebar extends StatelessComponent {
   final Component? search;
   final List<Component> entries;
@@ -12,18 +14,7 @@ final class Sidebar extends StatelessComponent {
       div(id: 'content-mobile', [
         form(classes: 'td-sidebar__search d-flex align-items-center', [
           ?search,
-          button(
-            classes: 'btn btn-link td-sidebar__toggle',
-            type: ButtonType.button,
-            attributes: {
-              'data-bs-toggle': 'collapse',
-              'data-bs-target': '#td-section-nav',
-              'aria-controls': 'td-section-av',
-              'aria-expanded': 'false',
-              'aria-label': 'Toggle section navigation',
-            },
-            [],
-          ),
+          const MobileSidebarToggle(),
         ]),
       ]),
       div(id: 'content-desktop', []),
