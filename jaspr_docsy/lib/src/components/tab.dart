@@ -3,7 +3,9 @@ import 'package:jaspr_content/jaspr_content.dart';
 
 import '../../components/internal/tabs.dart';
 
-final class DocsyTabs implements CustomComponent {
+final class DocsyTabs extends CustomComponent {
+  DocsyTabs() : super.base();
+
   @override
   Component? create(Node node, NodesBuilder builder) {
     if (node is ElementNode && node.tag == 'Tabs') {
