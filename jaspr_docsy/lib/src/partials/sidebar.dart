@@ -1,4 +1,5 @@
-import 'package:jaspr/server.dart';
+import 'package:jaspr/dom.dart';
+import 'package:jaspr/jaspr.dart';
 
 import '../../components/internal/sidebar_toggle.dart';
 

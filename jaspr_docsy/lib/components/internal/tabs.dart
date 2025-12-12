@@ -1,3 +1,4 @@
+import 'package:jaspr/dom.dart';
 import 'package:jaspr/jaspr.dart';
 import 'package:universal_web/web.dart' as web;
 
@@ -8,7 +9,7 @@ final class TabPane extends StatelessComponent {
 
   @override
   Component build(BuildContext context) {
-    return fragment([
+    return Component.fragment([
       InternalTabHeaders(
         items: {for (final entry in entries) entry.value: entry.label},
       ),
@@ -69,7 +70,7 @@ final class _InternalTabHeadersState extends State<InternalTabHeaders> {
               button(
                 classes: 'nav-link${_isActive(i, key) ? ' active' : ''}',
                 attributes: {'role': 'tab'},
-                [text(value)],
+                [Component.text(value)],
                 events: {
                   'click': (e) {
                     setState(() {
