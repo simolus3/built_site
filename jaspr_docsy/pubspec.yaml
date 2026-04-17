@@ -1,6 +1,6 @@
 name: jaspr_docsy
 description: A port of the Docsy documentation theme to jaspr_content.
-version: 0.0.6
+version: 0.0.7
 
 environment:
   sdk: ^3.10.0
