@@ -74,7 +74,7 @@ abstract base class DocsyLayout extends PageLayoutBase {
         Component.element(
           tag: 'head',
           children: [
-            HeadDocument(
+            Document.head(
               meta: {
                 'charset': 'utf-8',
                 'viewport':
